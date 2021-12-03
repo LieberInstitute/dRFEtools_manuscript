@@ -26,15 +26,16 @@ def load_data(simu):
     state = 13 + simu
     X, y = make_classification(
         n_samples=500, n_features=20000, n_informative=100, n_redundant=300,
-        n_repeated=0, n_classes=2, n_clusters_per_class=1, random_state=state
+        n_repeated=0, n_classes=2, n_clusters_per_class=1, random_state=state,
+        shuffle=False,
     )
     return X, y
 
 
 def run_oob(estimator, x_train, x_test, y_train, y_test, fold, outdir,
             frac, step, simu, elim_rate):
-    features = x_train.columns
-    d, pfirst = dRFEtools.rf_rfe(estimator, x_train, y_train, features,
+    features = ["feature_%d" % x for x in range(x_train.shape[1])]
+    d, pfirst = dRFEtools.rf_rfe(estimator, x_train, y_train, np.array(features),
                                  fold, outdir, elimination_rate=elim_rate,
                                  RANK=True)
     df_elim = pd.DataFrame([{'fold':fold, "simulation": simu,
@@ -58,10 +59,10 @@ def run_oob(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     ## Fit model
     estimator.fit(x_train, y_train)
     all_fts = estimator.predict(x_test)
-    estimator.fit(x_train.iloc[:, d[n_redundant][4]], y_train)
-    labels_pred_redundant = estimator.predict(x_test.iloc[:, d[n_redundant][4]])
-    estimator.fit(x_train.iloc[:,d[n_features][4]], y_train)
-    labels_pred = estimator.predict(x_test.iloc[:, d[n_features][4]])
+    estimator.fit(x_train[:, d[n_redundant][4]], y_train)
+    labels_pred_redundant = estimator.predict(x_test[:, d[n_redundant][4]])
+    estimator.fit(x_train[:,d[n_features][4]], y_train)
+    labels_pred = estimator.predict(x_test[:, d[n_features][4]])
     ## Output test predictions
     kwargs = {"average": "weighted"}
     pd.DataFrame({'fold': fold, "simulation": simu, "elimination": elim_rate,
@@ -89,9 +90,9 @@ def run_oob(estimator, x_train, x_test, y_train, y_test, fold, outdir,
 
 
 def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
-                 frac, step, simu, elim_rate):
-    features = x_train.columns
-    d, pfirst = dRFEtools.dev_rfe(estimator, x_train, y_train, features,
+            frac, step, simu, elim_rate):
+    features = ["feature_%d" % x for x in range(x_train.shape[1])]
+    d, pfirst = dRFEtools.dev_rfe(estimator, x_train, y_train, np.array(features),
                                   fold, outdir, elimination_rate=elim_rate,
                                   RANK=True)
     df_elim = pd.DataFrame([{'fold':fold, "simulation": simu,
@@ -116,10 +117,10 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     #x_dev, x_test, y_dev, y_test = train_test_split(x_train, y_train)
     estimator.fit(x_train, y_train)
     all_fts = estimator.predict(x_test)
-    estimator.fit(x_train.iloc[:, d[n_redundant][4]], y_train)
-    labels_pred_redundant = estimator.predict(x_test.iloc[:, d[n_redundant][4]])
-    estimator.fit(x_train.iloc[:,d[n_features][4]], y_train)
-    labels_pred = estimator.predict(x_test.iloc[:, d[n_features][4]])
+    estimator.fit(x_train[:, d[n_redundant][4]], y_train)
+    labels_pred_redundant = estimator.predict(x_test[:, d[n_redundant][4]])
+    estimator.fit(x_train[:,d[n_features][4]], y_train)
+    labels_pred = estimator.predict(x_test[:, d[n_features][4]])
     ## Output test predictions
     kwargs = {"average": "weighted"}
     pd.DataFrame({'fold': fold, "simulation": simu, "elimination": elim_rate,
@@ -136,13 +137,13 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     output['n_redundant'] = n_redundant
     output['n_max'] = n_features_max
     output['train_nmi'] = dRFEtools.dev_score_nmi(estimator,
-                                                  x_train.iloc[:,d[n_features][4]],
+                                                  x_train[:,d[n_features][4]],
                                                   y_train)
     output['train_acc'] = dRFEtools.dev_score_accuracy(estimator,
-                                                       x_train.iloc[:,d[n_features][4]],
+                                                       x_train[:,d[n_features][4]],
                                                        y_train)
     output['train_roc'] = dRFEtools.dev_score_roc(estimator,
-                                                  x_train.iloc[:,d[n_features][4]],
+                                                  x_train[:,d[n_features][4]],
                                                   y_train)
     output['test_nmi'] = nmi(y_test, labels_pred, average_method="arithmetic")
     output['test_acc'] = accuracy_score(y_test, labels_pred)
@@ -152,9 +153,8 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     return df_elim, metrics_df
 
 
-def dRFE_run(estimator, outdir, simu, elim_rate, cv):
-    X, Y = load_data(simu)
-    y = Y.Group.astype("category").cat.codes
+def dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc):
+    X, y = load_data(simu)
     simu_out = "%s/simulate_%d" % (outdir, simu)
     mkdir_p(simu_out)
     ## default parameters
@@ -162,10 +162,10 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     df_dict = pd.DataFrame(); output = pd.DataFrame()
     start = time()
     for train_index, test_index in cv.split(X, y):
-        X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+        X_train, X_test = X[train_index, :], X[test_index, :]
         y_train, y_test = y[train_index], y[test_index]
-        df_elim, metrics_df = run_dev(estimator, X_train, X_test, y_train, y_test,
-                                      fold, simu_out, frac, step, simu,
+        df_elim, metrics_df = run_fnc(estimator, X_train, X_test, y_train,
+                                      y_test, fold, simu_out, frac, step, simu,
                                       elim_rate)
         df_dict = pd.concat([df_dict, df_elim], axis=0)
         output = pd.concat([output, metrics_df], axis=0)
@@ -180,10 +180,10 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     return end - start
 
 
-def permutation_run(estimator, outdir, elim_rate, cv):
+def permutation_run(estimator, outdir, elim_rate, cv, run_fnc):
     cpu_lt = []; simu_lt = []
     for simu in range(10):
-        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv)
+        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc)
         simu_lt.append(simu)
         cpu_lt.append(cpu)
     pd.DataFrame({"Simulation": simu_lt, "CPU Time": cpu_lt})\
@@ -199,24 +199,24 @@ def main():
     mkdir_p(outdir)
     cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
                                        max_iter=1000, penalty="l2")
-    permutation_run(cla, outdir, elim_rate, cv)
-    ## SVC linear kernel
-    outdir = 'svc/'
-    mkdir_p(outdir)
-    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
-    permutation_run(cla, outdir, elim_rate, cv)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## SGD classifier
     outdir = 'sgd/'
     mkdir_p(outdir)
     cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
                                   loss="perceptron")
-    permutation_run(cla, outdir, elim_rate, cv)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
+    ## SVC linear kernel
+    outdir = 'svc/'
+    mkdir_p(outdir)
+    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## Random forest
     outdir = 'rf/'
     mkdir_p(outdir)
     cla = dRFEtools.RandomForestClassifier(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
-    permutation_run(cla, outdir, elim_rate, cv)
+    permutation_run(cla, outdir, elim_rate, cv, run_oob)
 
 
 if __name__ == '__main__':
