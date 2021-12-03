@@ -26,7 +26,7 @@ def load_data(simu):
     state = 13 + simu
     X, y = make_regression(
         n_samples=500, n_features=20000, n_informative=200, bias=0.2,
-        n_targets=1, noise=10, random_state=state
+        n_targets=1, noise=0.5, random_state=state, shuffle=False,
     )
     return X, y
 
@@ -34,12 +34,13 @@ def load_data(simu):
 def rfecv_run(simu, cv, estimator, outdir, step):
     # Instantiate RFECV visualizer with a random forest regression
     X, y = load_data(simu)
+    features = ["feature_%d" % x for x in range(X.shape[1])]
     selector = RFECV(estimator, cv=cv, step=step, n_jobs=-1)
     start = time()
     selector = selector.fit(X, y)
     end = time()
     pd.DataFrame({"Simulation": simu,
-                  "Feature":X.columns,
+                  "Feature":features,
                   "Rank": selector.ranking_,
                   "Predictive": selector.support_,
                   "CPU Time": end - start,
@@ -47,6 +48,12 @@ def rfecv_run(simu, cv, estimator, outdir, step):
       .to_csv("%s/RFECV_%d_predictions.txt" % (outdir, step),
               sep='\t', mode='a', index=False,
               header=True if simu == 0 else False)
+
+
+def permutation_run(estimator, cv, outdir, step_size):
+    for simu in range(10):
+        print(simu)
+        rfecv_run(simu, cv, estimator, outdir, step_size)
 
 
 def main():
@@ -57,31 +64,23 @@ def main():
     outdir = 'ridge/'
     mkdir_p(outdir)
     regr = dRFEtools.Ridge(random_state=seed)
-    for simu in range(10):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
-    ## Elastic net
-    outdir = 'enet/'
-    mkdir_p(outdir)
-    regr = dRFEtools.ElasticNet(alpha=0.01, random_state=seed)
-    for simu in range(10):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
     ## SVR linear kernel
     outdir = 'svr/'
     mkdir_p(outdir)
     regr = dRFEtools.LinearSVR(random_state=seed, max_iter=10000)
-    for simu in range(10):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
+    ## Elastic net
+    outdir = 'enet/'
+    mkdir_p(outdir)
+    regr = dRFEtools.ElasticNet(alpha=0.01, random_state=seed, max_iter=10000)
+    permutation_run(regr, cv, outdir, step_size)
     ## Random forest
     outdir = 'rf/'
     mkdir_p(outdir)
     regr = dRFEtools.RandomForestRegressor(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
-    for simu in range(10):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
 
 
 if __name__ == '__main__':
