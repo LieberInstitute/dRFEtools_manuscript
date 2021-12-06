@@ -1,0 +1,19 @@
+#!/bin/bash
+
+SOFTWARE="/ceph/opt/plink-ng/1.9"
+OUTDIR="genotype_simulation"
+RANDOM_STATE=13
+
+mkdir $OUTDIR
+
+$SOFTWARE/plink --simulate-qt ../_h/pheno.sim --seed ${RANDOM_STATE} \
+                --simulate-n 500 --out ${OUTDIR}/quantitative
+
+for SIMU in `seq 0 9`; do
+    $SOFTWARE/plink --simulate-qt ${OUTDIR}/quantitative.simfreq \
+                    --simulate-n 500 --out ${OUTDIR}/simulation_${SIMU} \
+                    --seed ${RANDOM_STATE}
+    let "RANDOM_STATE+=1"
+done
+
+Rscript ../_h/simulate_bulk_geneExpression.R
