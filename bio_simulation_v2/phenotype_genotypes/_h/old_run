@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ls ../_h/*sh | parallel bash {}
