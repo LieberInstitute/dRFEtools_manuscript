@@ -25,7 +25,7 @@ x <- x[keep.x, , keep.lib.sizes=FALSE]
 sim.data.bulk <- SPsimSeq(n.sim=10, s.data=x$counts, n.genes=20000,
                           group=x$samples$tcga.cgc_sample_sample_type,
                           batch.config=1, group.config=c(0.6, 0.4),
-                          tot.samples=400, pDE=0.01, lfc.thrld=0.25,
+                          tot.samples=400, pDE=0.005, lfc.thrld=0.10,
                           result.format="list")
                                         # Save data
 outdir = "bulk_data"

@@ -161,7 +161,7 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     return df_elim, metrics_df
 
 
-def dRFE_run(estimator, outdir, simu, elim_rate, cv):
+def dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc):
     X, Y = load_data(simu)
     y = Y.Group.astype("category").cat.codes
     simu_out = "%s/simulate_%d" % (outdir, simu)
@@ -173,8 +173,8 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     for train_index, test_index in cv.split(X, y):
         X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
         y_train, y_test = y[train_index], y[test_index]
-        df_elim, metrics_df = run_dev(estimator, X_train, X_test, y_train, y_test,
-                                      fold, simu_out, frac, step, simu,
+        df_elim, metrics_df = run_fnc(estimator, X_train, X_test, y_train,
+                                      y_test, fold, simu_out, frac, step, simu,
                                       elim_rate)
         df_dict = pd.concat([df_dict, df_elim], axis=0)
         output = pd.concat([output, metrics_df], axis=0)
@@ -189,10 +189,10 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     return end - start
 
 
-def permutation_run(estimator, outdir, elim_rate, cv):
+def permutation_run(estimator, outdir, elim_rate, cv, run_fnc):
     cpu_lt = []; simu_lt = []
     for simu in range(10):
-        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv)
+        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc)
         simu_lt.append(simu)
         cpu_lt.append(cpu)
     pd.DataFrame({"Simulation": simu_lt, "CPU Time": cpu_lt})\
@@ -207,25 +207,25 @@ def main():
     outdir = 'lr/'
     mkdir_p(outdir)
     cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
-                                       max_iter=1000, penalty="l2")
-    permutation_run(cla, outdir, elim_rate, cv)
-    ## SVC linear kernel
-    outdir = 'svc/'
-    mkdir_p(outdir)
-    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
-    permutation_run(cla, outdir, elim_rate, cv)
+                                       max_iter=10000, penalty="l2")
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## SGD classifier
     outdir = 'sgd/'
     mkdir_p(outdir)
     cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
                                   loss="perceptron")
-    permutation_run(cla, outdir, elim_rate, cv)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
+    ## SVC linear kernel
+    outdir = 'svc/'
+    mkdir_p(outdir)
+    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## Random forest
     outdir = 'rf/'
     mkdir_p(outdir)
     cla = dRFEtools.RandomForestClassifier(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
-    permutation_run(cla, outdir, elim_rate, cv)
+    permutation_run(cla, outdir, elim_rate, cv, run_oob)
 
 
 if __name__ == '__main__':

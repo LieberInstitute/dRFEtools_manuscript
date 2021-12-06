@@ -72,7 +72,7 @@ def main():
     outdir = 'lr/'
     mkdir_p(outdir)
     cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
-                                       max_iter=1000, penalty="l2")
+                                       max_iter=10000, penalty="l2")
     permutation_run(cla, cv, outdir, step_size)
     ## SVC linear kernel
     outdir = 'svc/'
