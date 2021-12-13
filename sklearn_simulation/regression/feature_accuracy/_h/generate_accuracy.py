@@ -24,7 +24,10 @@ def get_features(simu):
 
 def rfe_accuracy(simu, algorithm, elim):
     true, false = get_features(simu)
-    fn = "../../_m/%s/RFECV_%.2f_predictions.txt" % (algorithm, elim)
+    if elim == 100:
+        fn = "../../_m/%s/RFECV_%d_predictions.txt" % (algorithm, elim)
+    else:
+        fn = "../../_m/%s/RFECV_%.2f_predictions.txt" % (algorithm, elim)
     df = pd.read_csv(fn, sep='\t')
     TP = df[(df["Simulation"] == simu) & (df["Feature"].isin(true)) &
             (df["Predictive"])].shape[0]
