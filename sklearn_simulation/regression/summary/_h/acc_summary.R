@@ -10,7 +10,7 @@ save_plot <- function(p, fn, w, h){
 }
 
 cal_metrics <- function(){
-    fn = "../../class_acc/_m/simulated_data_accuracy_metrics.tsv"
+    fn = "../../feature_accuracy/_m/simulated_data_accuracy_metrics.tsv"
     return(data.table::fread(fn) %>%
            mutate(ID=paste0(RFE_Method, " (",Elimination,")"),
                   Acc=(TP+TN)/(TP+FN+TN+FP), FDR=(1-(TP/(TP+FP))),
