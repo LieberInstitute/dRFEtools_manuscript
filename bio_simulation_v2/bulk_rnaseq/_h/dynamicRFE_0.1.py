@@ -13,6 +13,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.metrics import normalized_mutual_info_score as nmi
 
+
 def mkdir_p(directory):
     try:
         os.makedirs(directory)
@@ -31,7 +32,7 @@ def load_data(simu):
         tibble::column_to_rownames("V1") %>% as.matrix
     phenotypes <- data.table::fread(paste0("../../_m/bulk_data/simulated_sampleInfo_",
                                            simu, ".tsv")) %>%
-        tibble::column_to_rownames("V1")
+        tibble::column_to_rownames("V1") %>% select("Group")
     x <- edgeR::DGEList(counts=counts, samples=phenotypes)
     x <- edgeR::calcNormFactors(x, method="TMM")
     Z <- edgeR::cpm(x, log=TRUE) %>% as.data.frame
@@ -121,6 +122,7 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
         n_features = n_features_max
         n_redundant = n_features
     ## Fit model
+    #x_dev, x_test, y_dev, y_test = train_test_split(x_train, y_train)
     estimator.fit(x_train, y_train)
     all_fts = estimator.predict(x_test)
     estimator.fit(x_train.iloc[:, d[n_redundant][4]], y_train)
@@ -159,7 +161,7 @@ def run_dev(estimator, x_train, x_test, y_train, y_test, fold, outdir,
     return df_elim, metrics_df
 
 
-def dRFE_run(estimator, outdir, simu, elim_rate, cv):
+def dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc):
     X, Y = load_data(simu)
     y = Y.Group.astype("category").cat.codes
     simu_out = "%s/simulate_%d" % (outdir, simu)
@@ -171,8 +173,8 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     for train_index, test_index in cv.split(X, y):
         X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
         y_train, y_test = y[train_index], y[test_index]
-        df_elim, metrics_df = run_dev(estimator, X_train, X_test, y_train, y_test,
-                                      fold, simu_out, frac, step, simu,
+        df_elim, metrics_df = run_fnc(estimator, X_train, X_test, y_train,
+                                      y_test, fold, simu_out, frac, step, simu,
                                       elim_rate)
         df_dict = pd.concat([df_dict, df_elim], axis=0)
         output = pd.concat([output, metrics_df], axis=0)
@@ -187,10 +189,10 @@ def dRFE_run(estimator, outdir, simu, elim_rate, cv):
     return end - start
 
 
-def permutation_run(estimator, outdir, elim_rate, cv):
+def permutation_run(estimator, outdir, elim_rate, cv, run_fnc):
     cpu_lt = []; simu_lt = []
     for simu in range(10):
-        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv)
+        cpu = dRFE_run(estimator, outdir, simu, elim_rate, cv, run_fnc)
         simu_lt.append(simu)
         cpu_lt.append(cpu)
     pd.DataFrame({"Simulation": simu_lt, "CPU Time": cpu_lt})\
@@ -201,29 +203,29 @@ def main():
     ## Generate 10-fold cross-validation
     seed = 13; elim_rate = 0.1
     cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=20211005)
-    ## Logistic regression
-    outdir = 'lr/'
-    mkdir_p(outdir)
-    cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
-                                       max_iter=1000, penalty="l2")
-    permutation_run(cla, outdir, elim_rate, cv)
-    ## SVC linear kernel
-    outdir = 'svc/'
-    mkdir_p(outdir)
-    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
-    permutation_run(cla, outdir, elim_rate)
     ## SGD classifier
     outdir = 'sgd/'
     mkdir_p(outdir)
     cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
                                   loss="perceptron")
-    permutation_run(cla, outdir, elim_rate)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
+    ## SVC linear kernel
+    outdir = 'svc/'
+    mkdir_p(outdir)
+    cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
+    ## Logistic regression
+    outdir = 'lr/'
+    mkdir_p(outdir)
+    cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
+                                       max_iter=1000, penalty="l2")
+    permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## Random forest
     outdir = 'rf/'
     mkdir_p(outdir)
     cla = dRFEtools.RandomForestClassifier(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
-    permutation_run(cla, outdir, elim_rate)
+    permutation_run(cla, outdir, elim_rate, cv, run_oob)
 
 
 if __name__ == '__main__':

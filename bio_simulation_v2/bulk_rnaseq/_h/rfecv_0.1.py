@@ -32,7 +32,7 @@ def load_data(simu):
         tibble::column_to_rownames("V1") %>% as.matrix
     phenotypes <- data.table::fread(paste0("../../_m/bulk_data/simulated_sampleInfo_",
                                            simu, ".tsv")) %>%
-        tibble::column_to_rownames("V1")
+        tibble::column_to_rownames("V1") %>% select("Group")
     x <- edgeR::DGEList(counts=counts, samples=phenotypes)
     x <- edgeR::calcNormFactors(x, method="TMM")
     Z <- edgeR::cpm(x, log=TRUE) %>% as.data.frame
@@ -43,12 +43,13 @@ def load_data(simu):
 def rfecv_run(simu, cv, estimator, outdir, step):
     # Instantiate RFECV visualizer with a random forest regression
     X, y = load_data(simu)
+    y.loc[:, "Group"] = y.Group.astype("category").cat.codes
     selector = RFECV(estimator, cv=cv, step=step, n_jobs=-1)
     start = time()
-    selector = selector.fit(X, y)
+    selector = selector.fit(X, np.ravel(y))
     end = time()
     pd.DataFrame({"Simulation": simu,
-                  "Feature":X.columns,
+                  "Feature":np.array(X.columns),
                   "Rank": selector.ranking_,
                   "Predictive": selector.support_,
                   "CPU Time": end - start,
@@ -68,22 +69,22 @@ def main():
     ## Generate 10-fold cross-validation
     step_size = 0.1; seed = 13
     cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=20211005)
-    ## Logistic regression
-    outdir = 'lr/'
+    ## SGD classifier
+    outdir = 'sgd/'
     mkdir_p(outdir)
-    cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
-                                       max_iter=1000, penalty="l2")
+    cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
+                                  loss="perceptron")
     permutation_run(cla, cv, outdir, step_size)
     ## SVC linear kernel
     outdir = 'svc/'
     mkdir_p(outdir)
     cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
     permutation_run(cla, cv, outdir, step_size)
-    ## SGD classifier
-    outdir = 'sgd/'
+    ## Logistic regression
+    outdir = 'lr/'
     mkdir_p(outdir)
-    cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
-                                  loss="perceptron")
+    cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
+                                       max_iter=1000, penalty="l2")
     permutation_run(cla, cv, outdir, step_size)
     ## Random forest
     outdir = 'rf/'
