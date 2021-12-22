@@ -1,6 +1,6 @@
-# dynamic RFE simulations with phenotype ~ genotypes (20%)
+# dynamic RFE simulations with phenotype ~ genotypes (10%)
 """
-This script runs dynamic RFE with cross-validation for the 15
+This script runs dynamic RFE with cross-validation for the 10
 traits. Using feature elmination to impute trait from genotypes.
 """
 
@@ -231,7 +231,7 @@ def permutation_run(estimator, outdir, elim_rate, cv, run_fnc):
 
 def main():
     ## Generate 10-fold cross-validation
-    seed = 13; elim_rate = 0.2
+    seed = 13; elim_rate = 0.1
     cv = KFold(n_splits=10, shuffle=True, random_state=seed)
     ## Ridge
     outdir = 'ridge/dRFEtools_%.2f/' % elim_rate

@@ -12,31 +12,51 @@ import dRFEtools
 import numpy as np
 import pandas as pd
 from time import time
+from pandas_plink import read_plink
 from sklearn.model_selection import KFold
 from sklearn.feature_selection import RFECV
 
+
 @functools.lru_cache()
-def get_y_var():
-    # Correlated component
-    Ycorr = pd.read_csv("../../_m/genotype_simulation/Y_correlatedBg_genotype_simulation.csv", index_col=0)
-    # Genetic component
-    YgenBg = pd.read_csv("../../_m/genotype_simulation/Y_genBg_genotype_simulation.csv", index_col=0)
-    YgenFixed = pd.read_csv("../../_m/genotype_simulation/Y_genFixed_genotype_simulation.csv", index_col=0)
-    # Noise component
-    YnoiseBg = pd.read_csv("../../_m/genotype_simulation/Y_noiseBg_genotype_simulation.csv", index_col=0)
-    YnoiseFixed = pd.read_csv("../../_m/genotype_simulation/Y_noiseFixed_genotype_simulation.csv", index_col=0)
-    # Combine
-    Y = Ycorr + YgenBg + YgenFixed + YnoiseBg + YnoiseFixed
-    return Y
+def cached_read_plink(file_prefix, verbose=True):
+    """
+    Load plink files
+    """
+    return read_plink(file_prefix, verbose)
 
 
 @functools.lru_cache()
-def get_X_var():
-    snp_df = pd.read_csv("../../_m/genotype_simulation/Genotypes_genotype_simulation.csv",
-                         index_col=0).T
-    r = pd.get_dummies(snp_df, columns=snp_df.columns, dummy_na=True)
-    r.columns = r.columns.str.replace('\.\d+', '', regex=True)
-    return r
+def get_plink(simu):
+    """
+    Simulation file prefix for plink files
+    """
+    file_prefix = "../../_m/genotype_simulation/simulation_%d" % simu
+    return cached_read_plink(file_prefix)
+
+
+def select_snps_from_plink_to_df(simu):
+    """
+    Given a <bim, fam, bed> triple of files and returns a pandas DataFrame
+    with the SNP genotype values (0,1,2), where the rows are family IDs
+    and columns are SNP IDs.
+    """
+    (bim, fam, bed) = get_plink(simu)
+    dx = pd.DataFrame(bed.compute().transpose())
+    dx.index = fam['fid']
+    dx.columns = bim.snp
+    dy = fam.loc[:, ["fid","trait"]].set_index("fid")
+    dy.trait = dy.trait.astype("float")
+    return dx, dy
+
+
+def one_hot_encode_snp_df(snp_df):
+    """
+    Given a snp_df returned by select_snps_from_plink_to_df function,
+    returns a one-hot-encoded version of it
+    """
+    dx = pd.get_dummies(snp_df, columns=snp_df.columns, dummy_na=True)
+    dx.columns = dx.columns.str.replace('\.\d+', '', regex=True)
+    return dx
 
 
 def mkdir_p(directory):
@@ -48,9 +68,9 @@ def mkdir_p(directory):
 
 
 def load_data(simu):
-    X = get_X_var()
-    Y = get_y_var().iloc[:, simu]
-    return X,Y
+    snp_df, Y = select_snps_from_plink_to_df(simu)
+    X = one_hot_encode_snp_df(snp_df)
+    return snp_df, Y
 
 
 def rfecv_run(simu, cv, estimator, outdir, step):
@@ -71,6 +91,12 @@ def rfecv_run(simu, cv, estimator, outdir, step):
               header=True if simu == 0 else False)
 
 
+def permutation_run(estimator, cv, outdir, step_size):
+    for simu in range(10):
+        print(simu)
+        rfecv_run(simu, cv, estimator, outdir, step_size)
+
+
 def main():
     ## Generate 10-fold cross-validation
     step_size = 0.1; seed = 13
@@ -79,31 +105,23 @@ def main():
     outdir = 'ridge/'
     mkdir_p(outdir)
     regr = dRFEtools.Ridge(random_state=seed)
-    for simu in range(15):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
-    ## Elastic net
-    outdir = 'enet/'
-    mkdir_p(outdir)
-    regr = dRFEtools.ElasticNet(alpha=0.01, random_state=seed)
-    for simu in range(15):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
     ## SVR linear kernel
     outdir = 'svr/'
     mkdir_p(outdir)
     regr = dRFEtools.LinearSVR(random_state=seed, max_iter=10000)
-    for simu in range(15):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
+    ## Elastic net
+    outdir = 'enet/'
+    mkdir_p(outdir)
+    regr = dRFEtools.ElasticNet(alpha=0.01, random_state=seed)
+    permutation_run(regr, cv, outdir, step_size)
     ## Random forest
     outdir = 'rf/'
     mkdir_p(outdir)
     regr = dRFEtools.RandomForestRegressor(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
-    for simu in range(15):
-        print(simu)
-        rfecv_run(simu, cv, regr, outdir, step_size)
+    permutation_run(regr, cv, outdir, step_size)
 
 
 if __name__ == '__main__':

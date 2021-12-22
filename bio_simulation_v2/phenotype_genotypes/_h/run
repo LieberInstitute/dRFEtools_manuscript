@@ -2,15 +2,5 @@
 
 python ../_h/rfecv_0.1.py
 python ../_h/dynamicRFE_0.2.py
-
-for NOTEBOOK in dRFEtools; do
-    cp ../_h/${NOTEBOOK}.ipynb tmp_${NOTEBOOK}.ipynb
-    jupyter-nbconvert --execute --ExecutePreprocessor.timeout=-1 --to notebook \
-                      --stdout tmp_${NOTEBOOK}.ipynb > ${NOTEBOOK}.ipynb
-    jupyter nbconvert --to html ${NOTEBOOK}.ipynb
-    jupyter nbconvert --to pdf ${NOTEBOOK}.ipynb
-    rm -f tmp_${NOTEBOOK}.ipynb
-done
-
+python ../_h/dynamicRFE_0.1.py
 python ../_h/rfecv_100.py
-#python ../_h/rfecv_10.py
