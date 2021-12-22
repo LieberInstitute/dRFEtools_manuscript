@@ -1,6 +1,0 @@
-#!/bin/bash
-
-python ../_h/rfecv_0.1.py
-python ../_h/dynamicRFE_0.2.py
-python ../_h/dynamicRFE_0.1.py
-python ../_h/rfecv_100.py
