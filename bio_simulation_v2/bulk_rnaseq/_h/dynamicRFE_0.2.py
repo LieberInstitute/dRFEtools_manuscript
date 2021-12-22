@@ -204,24 +204,24 @@ def main():
     seed = 13; elim_rate = 0.2
     cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=20211005)
     ## SGD classifier
-    outdir = 'sgd/'
+    outdir = 'sgd/dRFEtools_%.2f/' % elim_rate
     mkdir_p(outdir)
     cla = dRFEtools.SGDClassifier(random_state=seed, n_jobs=-1,
                                   loss="perceptron")
     permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## SVC linear kernel
-    outdir = 'svc/'
+    outdir = 'svc/dRFEtools_%.2f/' % elim_rate
     mkdir_p(outdir)
     cla = dRFEtools.LinearSVC(random_state=seed, max_iter=10000)
     permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## Logistic regression
-    outdir = 'lr/'
+    outdir = 'lr/dRFEtools_%.2f/' % elim_rate
     mkdir_p(outdir)
     cla = dRFEtools.LogisticRegression(n_jobs=-1, random_state=seed,
                                        max_iter=1000, penalty="l2")
     permutation_run(cla, outdir, elim_rate, cv, run_dev)
     ## Random forest
-    outdir = 'rf/'
+    outdir = 'rf/dRFEtools_%.2f/' % elim_rate
     mkdir_p(outdir)
     cla = dRFEtools.RandomForestClassifier(n_estimators=100, oob_score=True,
                                            n_jobs=-1, random_state=seed)
