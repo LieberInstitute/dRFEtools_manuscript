@@ -1,0 +1,122 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: ggplot2
+[1] "Mean:"
+# A tibble: 16 × 8
+# Groups:   RFE_Method, Elimination [4]
+   RFE_Method Elimination Algorithm   Acc   FDR F1_score   TNR     CPU
+   <chr>            <dbl> <chr>     <dbl> <dbl>    <dbl> <dbl>   <dbl>
+ 1 dRFE               0.1 enet      0.990 0.762   0.384  0.990  171.  
+ 2 dRFE               0.1 rf        0.997 0.501   0.561  0.998 1092.  
+ 3 dRFE               0.1 ridge     0.960 0.932   0.127  0.960  228.  
+ 4 dRFE               0.1 svr       0.924 0.962   0.0727 0.923  561.  
+ 5 dRFE               0.2 enet      0.989 0.782   0.357  0.989   97.3 
+ 6 dRFE               0.2 rf        0.997 0.498   0.565  0.998  607.  
+ 7 dRFE               0.2 ridge     0.955 0.937   0.119  0.955  127.  
+ 8 dRFE               0.2 svr       0.922 0.963   0.0721 0.922  300.  
+ 9 RFE                0.1 enet      0.753 0.975   0.0481 0.752    4.57
+10 RFE                0.1 rf        0.583 0.986   0.0273 0.582  171.  
+11 RFE                0.1 ridge     0.831 0.684   0.0511 0.832    5.35
+12 RFE                0.1 svr       0.841 0.683   0.0521 0.842   21.7 
+13 RFE              100   enet      0.993 0.7     0.462  0.993   40.1 
+14 RFE              100   rf        0.991 0.79    0.323  0.992 1570.  
+15 RFE              100   ridge     0.993 0.72    0.431  0.993   42.4 
+16 RFE              100   svr       0.984 0.785   0.335  0.985  254.  
+[1] "Median:"
+# A tibble: 16 × 8
+# Groups:   RFE_Method, Elimination [4]
+   RFE_Method Elimination Algorithm   Acc   FDR F1_score   TNR     CPU
+   <chr>            <dbl> <chr>     <dbl> <dbl>    <dbl> <dbl>   <dbl>
+ 1 dRFE               0.1 enet      0.990 0.767   0.377  0.990  171.  
+ 2 dRFE               0.1 rf        0.997 0.473   0.582  0.998 1090.  
+ 3 dRFE               0.1 ridge     0.961 0.931   0.129  0.961  228.  
+ 4 dRFE               0.1 svr       0.924 0.962   0.0729 0.923  561.  
+ 5 dRFE               0.2 enet      0.989 0.790   0.347  0.989   97.4 
+ 6 dRFE               0.2 rf        0.997 0.488   0.586  0.998  607.  
+ 7 dRFE               0.2 ridge     0.959 0.934   0.124  0.959  127.  
+ 8 dRFE               0.2 svr       0.917 0.965   0.0676 0.917  301.  
+ 9 RFE                0.1 enet      0.903 0.970   0.0583 0.903    4.67
+10 RFE                0.1 rf        0.753 0.988   0.0229 0.752  174.  
+11 RFE                0.1 ridge     0.903 0.97    0.0583 0.903    6.02
+12 RFE                0.1 svr       0.903 0.97    0.0583 0.903   22.3 
+13 RFE              100   enet      0.993 0.7     0.462  0.993   40.6 
+14 RFE              100   rf        0.991 0.78    0.338  0.992 1569.  
+15 RFE              100   ridge     0.993 0.72    0.431  0.993   42.2 
+16 RFE              100   svr       0.992 0.75    0.385  0.992  254.  
+[1] "2021-12-22 15:06:28 EST"
+   user  system elapsed 
+  6.626   0.118   6.709 
+─ Session info  ──────────────────────────────────────────────────────────────────────────────────────────────────────
+ hash: flag: Somalia, SOON arrow, person walking: medium skin tone
+
+ setting  value
+ version  R version 4.1.2 (2021-11-01)
+ os       Arch Linux
+ system   x86_64, linux-gnu
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       America/New_York
+ date     2021-12-22
+ pandoc   2.14.1 @ /usr/bin/pandoc
+
+─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ package     * version date (UTC) lib source
+ abind         1.4-5   2016-07-21 [1] CRAN (R 4.1.2)
+ assertthat    0.2.1   2019-03-21 [1] CRAN (R 4.1.2)
+ backports     1.4.0   2021-11-23 [1] CRAN (R 4.1.2)
+ broom         0.7.10  2021-10-31 [1] CRAN (R 4.1.2)
+ car           3.0-12  2021-11-06 [1] CRAN (R 4.1.2)
+ carData       3.0-4   2020-05-22 [1] CRAN (R 4.1.2)
+ cli           3.1.0   2021-10-27 [1] CRAN (R 4.1.2)
+ colorspace    2.0-2   2021-06-24 [1] CRAN (R 4.1.2)
+ crayon        1.4.2   2021-10-29 [1] CRAN (R 4.1.2)
+ data.table    1.14.2  2021-09-27 [1] CRAN (R 4.1.2)
+ DBI           1.1.1   2021-01-15 [1] CRAN (R 4.1.2)
+ digest        0.6.28  2021-09-23 [1] CRAN (R 4.1.2)
+ dplyr       * 1.0.7   2021-06-18 [1] CRAN (R 4.1.2)
+ ellipsis      0.3.2   2021-04-29 [1] CRAN (R 4.1.2)
+ fansi         0.5.0   2021-05-25 [1] CRAN (R 4.1.2)
+ farver        2.1.0   2021-02-28 [1] CRAN (R 4.1.2)
+ generics      0.1.1   2021-10-25 [1] CRAN (R 4.1.2)
+ ggplot2     * 3.3.5   2021-06-25 [1] CRAN (R 4.1.2)
+ ggpubr      * 0.4.0   2020-06-27 [1] CRAN (R 4.1.2)
+ ggsci         2.9     2018-05-14 [1] CRAN (R 4.1.2)
+ ggsignif      0.6.3   2021-09-09 [1] CRAN (R 4.1.2)
+ glue          1.5.1   2021-11-30 [1] CRAN (R 4.1.2)
+ gtable        0.3.0   2019-03-25 [1] CRAN (R 4.1.2)
+ labeling      0.4.2   2020-10-20 [1] CRAN (R 4.1.2)
+ lifecycle     1.0.1   2021-09-24 [1] CRAN (R 4.1.2)
+ magrittr      2.0.1   2020-11-17 [1] CRAN (R 4.1.2)
+ munsell       0.5.0   2018-06-12 [1] CRAN (R 4.1.2)
+ pillar        1.6.4   2021-10-18 [1] CRAN (R 4.1.2)
+ pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.1.2)
+ purrr         0.3.4   2020-04-17 [1] CRAN (R 4.1.2)
+ R6            2.5.1   2021-08-19 [1] CRAN (R 4.1.2)
+ rlang         0.4.12  2021-10-18 [1] CRAN (R 4.1.2)
+ rstatix       0.7.0   2021-02-13 [1] CRAN (R 4.1.2)
+ scales        1.1.1   2020-05-11 [1] CRAN (R 4.1.2)
+ sessioninfo   1.2.1   2021-11-02 [1] CRAN (R 4.1.2)
+ svglite       2.0.0   2021-02-20 [1] CRAN (R 4.1.2)
+ systemfonts   1.0.3   2021-10-13 [1] CRAN (R 4.1.2)
+ tibble        3.1.6   2021-11-07 [1] CRAN (R 4.1.2)
+ tidyr         1.1.4   2021-09-27 [1] CRAN (R 4.1.2)
+ tidyselect    1.1.1   2021-04-30 [1] CRAN (R 4.1.2)
+ utf8          1.2.2   2021-07-24 [1] CRAN (R 4.1.2)
+ vctrs         0.3.8   2021-04-29 [1] CRAN (R 4.1.2)
+ withr         2.4.3   2021-11-30 [1] CRAN (R 4.1.2)
+
+ [1] /home/jbenja13/R/x86_64-pc-linux-gnu-library/4.1
+ [2] /usr/lib/R/library
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
