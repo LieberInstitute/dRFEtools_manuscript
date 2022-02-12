@@ -7,7 +7,11 @@ suppressPackageStartupMessages({
                                         # Function from jaffelab github
 merge_rse_metrics <- function(rse) {
     stopifnot(is(rse, 'RangedSummarizedExperiment'))
-
+    rse$numMapped = sapply(rse$numMapped, sum)
+    rse$numReads = sapply(rse$numReads, sum)
+    rse$numUnmapped = sapply(rse$numUnmapped, sum)
+    rse$mitoMapped = sapply(rse$mitoMapped, sum)
+    rse$totalMapped = sapply(rse$totalMapped, sum)
     rse$overallMapRate = mapply(function(r, n) {
         sum(r*n)/sum(n)
     }, rse$overallMapRate, rse$numReads)
@@ -20,12 +24,6 @@ merge_rse_metrics <- function(rse) {
     rse$totalAssignedGene = mapply(function(r, n) {
         sum(r*n)/sum(n)
     }, rse$totalAssignedGene, rse$numMapped)
-
-    rse$numMapped = sapply(rse$numMapped, sum)
-    rse$numReads = sapply(rse$numReads, sum)
-    rse$numUnmapped = sapply(rse$numUnmapped, sum)
-    rse$mitoMapped = sapply(rse$mitoMapped, sum)
-    rse$totalMapped = sapply(rse$totalMapped, sum)
     return(rse)
 }
 
@@ -41,6 +39,12 @@ get_mds <- function(){
 }
 memMDS <- memoise::memoise(get_mds)
 
+check_dup <- function(df){
+    sample <- df %>% select_if(is.numeric)
+    variables <- names(sample)
+    return(cytominer::correlation_threshold(variables, sample, cutoff=0.95))
+}
+
 prep_data <- function(){
     fn = paste0("/ceph/projects/brainseq/rnaseq/phase1_DLPFC_PolyA/jaffe_counts/",
                 "_m/dlpfc_polyA_brainseq_phase1_hg38_rseGene_merged_n732.rda")
@@ -51,13 +55,30 @@ prep_data <- function(){
     rse_df = rse_df[, keepIndex]
     rse_df$Dx = factor(rse_df$Dx, levels = c("Control", "MDD"))
     rse_df$Sex <- factor(rse_df$Sex)
-    rse_df <- merge_rse_metrics(rse_df)
     colData(rse_df)$RIN = sapply(colData(rse_df)$RIN,"[",1)
     rownames(colData(rse_df)) <- sapply(strsplit(rownames(colData(rse_df)), "_"),
                                         "[", 1)
+    #rse_df <- merge_rse_metrics(rse_df)
     pheno = colData(rse_df) %>% as.data.frame %>%
-        inner_join(memMDS(), by=c("BrNum"="FID")) %>%
-        distinct(RNum, .keep_all = TRUE)
+        select("RNum", "BrNum", "Dx", "Sex", "Age", "RIN", "mitoRate",
+               "totalAssignedGene", "overallMapRate", "concordMapRate",
+               "rRNA_rate", starts_with(c("Adapter", "phredGT", "percent")),
+               -AdapterContent) %>%
+        mutate_if(is.list, ~sapply(., sum)) %>%
+        mutate_if(is.numeric, scales::rescale) %>%
+        inner_join(memMDS() %>% select("FID", "snpPC1", "snpPC2", "snpPC3"),
+                   by=c("BrNum"="FID")) %>% distinct(RNum, .keep_all = TRUE)
+                                        # Remove highly correlated variables
+    ## Tested this by hand
+    drop_vars <- c("totalAssignedGene", "concordMapRate", "phredGT30_R1",
+                   "phredGT30_R2", "phredGT35_R1", "phredGT35_R2",
+                   "Adapter50.51_R1", "Adapter50.51_R2", "Adapter88_R1",
+                   "Adapter88_R2", "Adapter70.71_R1")
+    pheno <- pheno %>% select(-all_of(drop_vars))
+    if(length(check_dup(pheno)) != 0){
+        pheno <- pheno %>% select(-check_dup(pheno))
+    }
+                                        # Make DGEList variable
     x <- edgeR::DGEList(counts=assays(rse_df)$counts[, pheno$RNum],
                         genes=rowData(rse_df), samples=pheno)
     design0 <- model.matrix(~Dx, data=x$samples)
@@ -85,9 +106,9 @@ memQSV <- memoise::memoise(cal_qSV)
 qSV_model <- function(){
     x <- memPREP()
                                         # Design matrix
-    mod = model.matrix(~Dx + Race + Sex + Age + mitoRate + rRNA_rate +
-                           RIN + totalAssignedGene + overallMapRate +
-                           snpPC1 + snpPC2 + snpPC3,
+    mod = model.matrix(~Dx + Sex + Age + RIN + mitoRate + rRNA_rate +
+                           overallMapRate + Adapter70.71_R2 + percentGC_R1 +
+                           percentGC_R2 + snpPC1 + snpPC2 + snpPC3,
                        data=x$samples)
     colnames(mod) <- gsub("Dx", "", colnames(mod))
     colnames(mod) <- gsub("SexM", "Male", colnames(mod))
@@ -109,12 +130,34 @@ get_voom <- function(){
     # Get model
     modQsva <- memMODEL()
     v <- limma::voom(x[, rownames(modQsva)], modQsva)
-    save(v, file='voomSVA.RData')
     return(v)
 }
+memVOOM <- memoise::memoise(get_voom)
 
-## Run voom normalization
-get_voom()
+cal_res <- function(){
+                                        # Calculate residuals
+    v          <- memVOOM()
+    null_model <- v$design %>% as.data.frame %>% select(-c("MDD")) %>% as.matrix
+    fit_res    <- limma::lmFit(v, design=null_model)
+    res        <- v$E - ( fit_res$coefficients %*% t(null_model) )
+    res_sd     <- apply(res, 1, sd)
+    res_mean   <- apply(res, 1, mean)
+    res_norm   <- (res - res_mean) / res_sd
+    write.table(res_norm, file='residualized_expression.tsv',
+                sep="\t", quote=FALSE)
+}
+memRES <- memoise::memoise(cal_res)
+
+#### MAIN ####
+main <- function(){
+                                        # Run voom normalization
+    v <- memVOOM()
+    save(v, file='voomSVA.RData')
+                                        # Residualize data
+    memRES()
+}
+
+main()
 
 ## Reproducibility
 Sys.time()

@@ -1,7 +1,3 @@
 #!/bin/bash
 
-GTF="/ceph/genome/human/gencode25/gtf.CHR/_m/gencode.v25.annotation.gtf"
-
 Rscript ../_h/filter_expr.R
-python ../_h/sgd_rfe.py --voom_file "voomSVA.RData" --gtf_file $GTF
-python ../_h/rf_rfe.py --voom_file "voomSVA.RData" --gtf_file $GTF
