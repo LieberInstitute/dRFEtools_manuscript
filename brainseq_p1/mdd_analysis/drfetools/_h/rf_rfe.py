@@ -224,7 +224,7 @@ def main_loop(args):
               'test_nmi', 'test_roc', 'n_redundant', 'test_acc_redundant',
               'test_nmi_redundant', 'test_roc_redundant']
     optimize_rf(X, Y, cla, skf, outdir)
-    frac = 0.30; step_size = 0.04; fold = 0
+    frac = 0.30; step_size = 0.02; fold = 0
     df_dict = pd.DataFrame()
     with open("%s/dRFEtools_10folds.txt" % (outdir), "w") as f:
         print("\t".join(["fold"] + fields), file=f, flush=True)
