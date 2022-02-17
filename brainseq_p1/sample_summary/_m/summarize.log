@@ -1,0 +1,40 @@
+Dx
+Bipolar     62
+Control    207
+MDD        142
+Schizo     172
+dtype: int64
+Dx       Sex
+Bipolar  F       29
+         M       33
+Control  F       60
+         M      147
+MDD      F       56
+         M       86
+Schizo   F       62
+         M      110
+dtype: int64
+Dx       Race
+Bipolar  AA        6
+         CAUC     56
+Control  AA      117
+         CAUC     90
+MDD      AA       15
+         CAUC    127
+Schizo   AA       77
+         CAUC     95
+dtype: int64
+Mean:
+               Age       RIN
+Dx                          
+Bipolar  45.650230  7.809677
+Control  43.393383  8.321739
+MDD      44.801990  8.021127
+Schizo   49.697904  7.956977
+Standard deviation
+               Age       RIN
+Dx                          
+Bipolar  14.231727  1.037922
+Control  15.402804  0.734094
+MDD      13.237809  0.902623
+Schizo   14.766237  0.931017
