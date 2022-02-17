@@ -16,7 +16,7 @@ main <- function(){
                                         "[", 1)
 
     colData(rse_df) %>% as.data.frame %>%
-        dplyr::select("RNum", "BrNum", "Dx", "Sex", "Age", "RIN", "mitoRate",
+        dplyr::select("RNum", "BrNum", "Dx", "Race", "Sex", "Age", "RIN", "mitoRate",
                       "totalAssignedGene", "overallMapRate", "rRNA_rate",
                       dplyr::starts_with(c("Adapter", "phredGT", "percent")),
                       -AdapterContent,) %>%
