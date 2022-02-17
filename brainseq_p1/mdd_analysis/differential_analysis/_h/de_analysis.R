@@ -1,5 +1,4 @@
-## This script performs differential expression analysis for MDD.
-suppressMessages({
+## This script performs differential expression analysis for MDD.suppressMessages({
     library(dplyr)
 })
 
