@@ -1,0 +1,18 @@
+CPU comparison:
+                          sum_sq     df              F         PR(>F)
+C(ID)               5.408200e+06    3.0   74498.795274  1.650888e-229
+C(Algorithm)        1.595780e+07    3.0  219821.111232  2.493855e-263
+C(ID):C(Algorithm)  7.472236e+06    9.0   34310.406276  4.096034e-235
+Residual            3.484534e+03  144.0            NaN            NaN
+Accuracy comparison:
+                      sum_sq     df          F        PR(>F)
+C(ID)               1.500987    3.0  20.846490  2.834802e-11
+C(Algorithm)        0.045223    3.0   0.628082  5.980033e-01
+C(ID):C(Algorithm)  0.453796    9.0   2.100853  3.303204e-02
+Residual            3.456091  144.0        NaN           NaN
+FDR comparison:
+                      sum_sq     df          F        PR(>F)
+C(ID)               0.139599    3.0   1.594477  1.933272e-01
+C(Algorithm)        0.545798    3.0   6.233998  5.209080e-04
+C(ID):C(Algorithm)  3.105560    9.0  11.823689  8.094108e-14
+Residual            4.202492  144.0        NaN           NaN

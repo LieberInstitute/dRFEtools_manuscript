@@ -59,26 +59,24 @@ def twoway_anova():
 
 def tukey_analysis():
     res = stat()
-    with open("stats_output.log", "a") as f:
-        print("Tukey HSD:")
-        # CPU
-        res.tukey_hsd(df=add_metrics(), res_var="CPU",
-                      xfac_var=["ID", "Algorithm"],
-                      anova_model="CPU ~ C(ID)*C(Algorithm)")
-        print("CPU comparison:", file=f)
-        print(res.tukey_summary, file=f)
-        # Accuracy
-        res.tukey_hsd(df=add_metrics(), res_var="Accuracy",
-                      xfac_var=["ID", "Algorithm"],
-                      anova_model="Accuracy ~ C(ID)*C(Algorithm)")
-        print("Accuracy comparison:", file=f)
-        print(res.tukey_summary, file=f)
-        # FDR
-        res.tukey_hsd(df=add_metrics(), res_var="FDR",
-                      xfac_var=["ID", "Algorithm"],
-                      anova_model="FDR ~ C(ID)*C(Algorithm)")
-        print("FDR comparison:", file=f)
-        print(res.tukey_summary, file=f)
+    # CPU
+    res.tukey_hsd(df=add_metrics(), res_var="CPU", xfac_var=["ID", "Algorithm"],
+                  anova_model="CPU ~ C(ID)*C(Algorithm)")
+    df1 = pd.DataFrame(res.tukey_summary)
+    df1.loc[:, "Metrics"] = "CPU"
+    # Accuracy
+    res.tukey_hsd(df=add_metrics(), res_var="Accuracy",
+                  xfac_var=["ID", "Algorithm"],
+                  anova_model="Accuracy ~ C(ID)*C(Algorithm)")
+    df2 = pd.DataFrame(res.tukey_summary)
+    df2.loc[:, "Metrics"] = "Accuracy"
+    # FDR
+    res.tukey_hsd(df=add_metrics(), res_var="FDR", xfac_var=["ID", "Algorithm"],
+                  anova_model="FDR ~ C(ID)*C(Algorithm)")
+    df3 = pd.DataFrame(res.tukey_summary)
+    df3.loc[:, "Metrics"] = "FDR"
+    pd.concat([df1, df2, df3], axis=0)\
+      .to_csv("tukey_results.tsv", sep='\t', index=False)
 
 
 def main():
