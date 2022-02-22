@@ -1,0 +1,63 @@
+CPU comparison:
+                          sum_sq     df              F         PR(>F)
+C(ID)               5.408200e+06    3.0   74498.795274  1.650888e-229
+C(Algorithm)        1.595780e+07    3.0  219821.111232  2.493855e-263
+C(ID):C(Algorithm)  7.472236e+06    9.0   34310.406276  4.096034e-235
+Residual            3.484534e+03  144.0            NaN            NaN
+Accuracy comparison:
+                      sum_sq     df          F        PR(>F)
+C(ID)               1.500987    3.0  20.846490  2.834802e-11
+C(Algorithm)        0.045223    3.0   0.628082  5.980033e-01
+C(ID):C(Algorithm)  0.453796    9.0   2.100853  3.303204e-02
+Residual            3.456091  144.0        NaN           NaN
+FDR comparison:
+                      sum_sq     df          F        PR(>F)
+C(ID)               0.139599    3.0   1.594477  1.933272e-01
+C(Algorithm)        0.545798    3.0   6.233998  5.209080e-04
+C(ID):C(Algorithm)  3.105560    9.0  11.823689  8.094108e-14
+Residual            4.202492  144.0        NaN           NaN
+CPU comparison:
+                group1              group2  ...     q-value  p-value
+0     (RFE_0.1, ridge)     (RFE_0.1, enet)  ...    0.502085    0.900
+1     (RFE_0.1, ridge)      (RFE_0.1, svr)  ...   10.485076    0.001
+2     (RFE_0.1, ridge)       (RFE_0.1, rf)  ...  106.780189    0.001
+3     (RFE_0.1, ridge)  (RFE_100.0, ridge)  ...   23.822249    0.001
+4     (RFE_0.1, ridge)   (RFE_100.0, enet)  ...   22.332413    0.001
+..                 ...                 ...  ...         ...      ...
+115  (dRFE_0.2, ridge)     (dRFE_0.2, svr)  ...  110.830318    0.001
+116  (dRFE_0.2, ridge)      (dRFE_0.2, rf)  ...  308.296988    0.001
+117   (dRFE_0.2, enet)     (dRFE_0.2, svr)  ...  130.043729    0.001
+118   (dRFE_0.2, enet)      (dRFE_0.2, rf)  ...  327.510400    0.001
+119    (dRFE_0.2, svr)      (dRFE_0.2, rf)  ...  197.466670    0.001
+
+[120 rows x 7 columns]
+Accuracy comparison:
+                group1              group2  ...   q-value   p-value
+0     (RFE_0.1, ridge)     (RFE_0.1, enet)  ...  1.595981  0.900000
+1     (RFE_0.1, ridge)      (RFE_0.1, svr)  ...  0.204142  0.900000
+2     (RFE_0.1, ridge)       (RFE_0.1, rf)  ...  5.076600  0.036803
+3     (RFE_0.1, ridge)  (RFE_100.0, ridge)  ...  3.293829  0.588324
+4     (RFE_0.1, ridge)   (RFE_100.0, enet)  ...  3.301995  0.584693
+..                 ...                 ...  ...       ...       ...
+115  (dRFE_0.2, ridge)     (dRFE_0.2, svr)  ...  0.657745  0.900000
+116  (dRFE_0.2, ridge)      (dRFE_0.2, rf)  ...  0.863316  0.900000
+117   (dRFE_0.2, enet)     (dRFE_0.2, svr)  ...  1.361218  0.900000
+118   (dRFE_0.2, enet)      (dRFE_0.2, rf)  ...  0.159843  0.900000
+119    (dRFE_0.2, svr)      (dRFE_0.2, rf)  ...  1.521061  0.900000
+
+[120 rows x 7 columns]
+FDR comparison:
+                group1              group2  ...   q-value   p-value
+0     (RFE_0.1, ridge)     (RFE_0.1, enet)  ...  5.397647  0.017726
+1     (RFE_0.1, ridge)      (RFE_0.1, svr)  ...  0.009255  0.900000
+2     (RFE_0.1, ridge)       (RFE_0.1, rf)  ...  5.596667  0.010964
+3     (RFE_0.1, ridge)  (RFE_100.0, ridge)  ...  0.672619  0.900000
+4     (RFE_0.1, ridge)   (RFE_100.0, enet)  ...  0.302401  0.900000
+..                 ...                 ...  ...       ...       ...
+115  (dRFE_0.2, ridge)     (dRFE_0.2, svr)  ...  0.481103  0.900000
+116  (dRFE_0.2, ridge)      (dRFE_0.2, rf)  ...  8.123399  0.001000
+117   (dRFE_0.2, enet)     (dRFE_0.2, svr)  ...  3.334882  0.570068
+118   (dRFE_0.2, enet)      (dRFE_0.2, rf)  ...  5.269621  0.023854
+119    (dRFE_0.2, svr)      (dRFE_0.2, rf)  ...  8.604502  0.001000
+
+[120 rows x 7 columns]
