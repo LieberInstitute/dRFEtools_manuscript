@@ -1,0 +1,9 @@
+#!/bin/bash
+
+GTF="/ceph/genome/human/gencode25/gtf.CHR/_m/gencode.v25.annotation.gtf"
+
+for DX in MDD Schizo Bipolar; do
+    echo "${DX,,}"
+    VOOM="../../_m/${DX,,}/voomSVA.RData"
+    python ../_h/dRFE_rf.py --voom_file $VOOM --gtf_file $GTF --diagnosis $DX
+done
