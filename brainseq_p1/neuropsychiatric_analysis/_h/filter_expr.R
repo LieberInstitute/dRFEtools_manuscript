@@ -45,15 +45,14 @@ check_dup <- function(df){
     return(cytominer::correlation_threshold(variables, sample, cutoff=0.95))
 }
 
-prep_data <- function(diagnosis){
+prep_data <- function(){
     fn = paste0("/ceph/projects/brainseq/rnaseq/phase1_DLPFC_PolyA/jaffe_counts/",
                 "_m/dlpfc_polyA_brainseq_phase1_hg38_rseGene_merged_n732.rda")
     load(fn)
     rse_df = rse_gene
-    keepIndex = which((rse_df$Dx %in% c("Control", diagnosis)) &
-                      rse_df$Age > 17 & rse_df$Race %in% c("AA", "CAUC"))
+    keepIndex = which(rse_df$Age > 17 & rse_df$Race %in% c("AA", "CAUC"))
     rse_df = rse_df[, keepIndex]
-    rse_df$Dx = factor(rse_df$Dx, levels = c("Control", diagnosis))
+    rse_df$Dx = factor(rse_df$Dx, levels = c("Control", "Bipolar", "MDD", "Schizo"))
     rse_df$Sex <- factor(rse_df$Sex)
     colData(rse_df)$RIN = sapply(colData(rse_df)$RIN,"[",1)
     rownames(colData(rse_df)) <- sapply(strsplit(rownames(colData(rse_df)), "_"),
@@ -103,8 +102,8 @@ cal_qSV <- function(){
 }
 memQSV <- memoise::memoise(cal_qSV)
 
-qSV_model <- function(diagnosis){
-    x <- memPREP(diagnosis)
+qSV_model <- function(){
+    x <- memPREP()
                                         # Design matrix
     mod = model.matrix(~Dx + Sex + Age + RIN + mitoRate + rRNA_rate +
                            overallMapRate + Adapter70.71_R2 + percentGC_R1 +
@@ -115,7 +114,8 @@ qSV_model <- function(diagnosis){
     colnames(mod) <- gsub("\\(Intercept\\)", "Intercept", colnames(mod))
                                         # Load qSV
     qsv = memQSV() %>% tibble::rownames_to_column()
-    modQsva <- mod %>% as.data.frame %>% tibble::rownames_to_column() %>%
+    modQsva <- mod %>% as.data.frame %>%
+        tibble::rownames_to_column() %>%
         inner_join(qsv, by="rowname") %>%
         rename_all(list(~stringr::str_replace_all(., 'PC', 'qPC'))) %>%
         tibble::column_to_rownames("rowname") %>% as.matrix
@@ -123,55 +123,38 @@ qSV_model <- function(diagnosis){
 }
 memMODEL <- memoise::memoise(qSV_model)
 
-get_voom <- function(diagnosis){
+get_voom <- function(){
                                         # Preform voom
-    x <- memPREP(diagnosis)
+    x <- memPREP()
     # Get model
-    modQsva <- memMODEL(diagnosis)
+    modQsva <- memMODEL()
     v <- limma::voom(x[, rownames(modQsva)], modQsva)
     return(v)
 }
 memVOOM <- memoise::memoise(get_voom)
 
-get_null <- function(diagnosis){
-    v <- memVOOM(diagnosis)
-    if(diagnosis == "MDD"){
-        null_model <- v$design %>% as.data.frame %>%
-            select(-c("MDD")) %>% as.matrix
-    } else if(diagnosis == "Schizo") {
-        null_model <- v$design %>% as.data.frame %>%
-            select(-c("Schizo")) %>% as.matrix
-    } else {
-        null_model <- v$design %>% as.data.frame %>%
-            select(-c("Bipolar")) %>% as.matrix
-    }
-    return(null_model)
-}
-
-cal_res <- function(diagnosis){
+cal_res <- function(){
                                         # Calculate residuals
-    v          <- memVOOM(diagnosis)
-    null_model <- get_null(diagnosis)
+    v          <- memVOOM()
+    null_model <- v$design %>% as.data.frame %>%
+        select(-c("MDD", "Bipolar", "Schizo")) %>% as.matrix
     fit_res    <- limma::lmFit(v, design=null_model)
     res        <- v$E - ( fit_res$coefficients %*% t(null_model) )
     res_sd     <- apply(res, 1, sd)
     res_mean   <- apply(res, 1, mean)
     res_norm   <- (res - res_mean) / res_sd
-    write.table(res_norm, sep="\t", quote=FALSE,
-                file=paste0(tolower(diagnosis), '/residualized_expression.tsv'))
+    write.table(res_norm, file='residualized_expression.tsv',
+                sep="\t", quote=FALSE)
 }
 memRES <- memoise::memoise(cal_res)
 
 #### MAIN ####
 main <- function(){
-    for(diagnosis in c("MDD", "Schizo")){
-        dir.create(tolower(diagnosis))
                                         # Run voom normalization
-        v <- memVOOM(diagnosis)
-        save(v, file=paste0(tolower(diagnosis),'/voomSVA.RData'))
+    v <- memVOOM()
+    save(v, file='voomSVA.RData')
                                         # Residualize data
-        memRES(diagnosis)
-    }
+    memRES()
 }
 
 main()
