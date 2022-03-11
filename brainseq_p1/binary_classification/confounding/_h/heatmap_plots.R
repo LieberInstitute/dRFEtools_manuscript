@@ -171,7 +171,7 @@ tile_plot <- function(covars, diagnosis, qsv=TRUE, norm=TRUE, identity=TRUE){
 }
 
 #### Correlation with expression PCs ####
-for(diagnosis in c("MDD", "Schizo", "Bipolar")){
+for(diagnosis in c("MDD", "Schizo")){
     outdir <- tolower(diagnosis)
     dir.create(outdir)
     ## Get covariates
