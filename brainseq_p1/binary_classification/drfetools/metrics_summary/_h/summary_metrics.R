@@ -70,7 +70,7 @@ extract_ml_data <- function(diagnosis, MAX=TRUE){
 extract_n_save <- function(){
     maxlist = list(); pred_featlist = list();
     redund_list1 = list(); redund_list2 = list()
-    for(diagnosis in c("MDD", "Schizo", "Bipolar")){
+    for(diagnosis in c("MDD", "Schizo")){
         nf = filter(summary_max_data(diagnosis), Test == "n_features")$Median
         nfr = filter(summary_redundant_data(diagnosis),
                      Test == "n_redundant")$Median
@@ -98,7 +98,7 @@ extract_n_save <- function(){
 
 plot_n_save <- function(MAX){
     datalist = list()
-    for(diagnosis in c("MDD", "Schizo", "Bipolar")){
+    for(diagnosis in c("MDD", "Schizo")){
         datalist[[diagnosis]] <- extract_ml_data(diagnosis, MAX)
     }
     dt = bind_rows(datalist) %>% mutate_if(is.character, as.factor) %>%

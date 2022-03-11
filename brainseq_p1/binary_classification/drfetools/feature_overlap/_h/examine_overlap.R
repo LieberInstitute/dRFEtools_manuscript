@@ -10,8 +10,7 @@ save_plot <- function(p, fn, w=7, h=7){
 
 get_deg <- function(diagnosis){
     dx_lt <- list("MDD"="../../../differential_analysis/_m/mdd/diffExpr_CTLvsMDD_full.txt",
-                  "Schizo"="../../../differential_analysis/_m/schizo/diffExpr_CTLvsSZ_full.txt",
-                  "Bipolar"="../../../differential_analysis/_m/bipolar/diffExpr_CTLvsBD_full.txt")
+                  "Schizo"="../../../differential_analysis/_m/schizo/diffExpr_CTLvsSZ_full.txt")
     df <- data.table::fread(dx_lt[[diagnosis]]) %>%
         dplyr::filter(adj.P.Val < 0.05)
     return(df$gencodeID)
@@ -49,7 +48,7 @@ extract_overlap <- function(diagnosis){
 
 ##### MAIN ########
 main <- function(){
-    for(dx in c("MDD", "Schizo", "Bipolar")){
+    for(dx in c("MDD", "Schizo")){
         extract_overlap(dx)
         plot_venn(dx)
     }

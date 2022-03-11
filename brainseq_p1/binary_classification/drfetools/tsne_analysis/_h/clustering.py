@@ -109,7 +109,7 @@ def save_plot(p, fn, width=7, height=7):
 
 
 def main():
-    for dx in ["MDD", "Schizo", "Bipolar"]:
+    for dx in ["MDD", "Schizo"]:
         pp = plot_tsne(get_predictive, dx)
         qq = plot_tsne(get_overlap, dx)
         save_plot(pp, "predictive_clustering_%s" % dx.lower())
