@@ -66,7 +66,7 @@ get_label <- function(diagnosis){
 }
 
 ##### MAIN ######
-for(diagnosis in c("MDD", "Schizo", "Bipolar")){
+for(diagnosis in c("MDD", "Schizo")){
                                         # Make directory
     outdir <- tolower(diagnosis)
     dir.create(outdir)

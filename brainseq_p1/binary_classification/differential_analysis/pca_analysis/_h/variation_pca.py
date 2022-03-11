@@ -133,7 +133,7 @@ def save_plot(p, fn, width=7, height=7):
 
 
 def main():
-    for diagnosis in ["MDD", "Schizo", "Bipolar"]:
+    for diagnosis in ["MDD", "Schizo"]:
         pp = plot_corr(diagnosis)
         save_plot(pp, "deg_variation_%s" % diagnosis.lower())
 

@@ -69,7 +69,7 @@ def run_goea(dx):
 
 def main():
     environ['NUMEXPR_MAX_THREADS'] = '32'
-    for diagnosis in ["MDD", "Schizo", "Bipolar"]:
+    for diagnosis in ["MDD", "Schizo"]:
         run_goea(diagnosis)
 
 
