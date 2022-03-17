@@ -1,0 +1,15 @@
+#!/bin/bash
+## Author: Kynon J Benjamin
+##
+## This script runs extract_snps.sh in parallel.
+##
+## Input: Annotated features, and annotation file for gene locations
+##
+## Output: BFILE (BED/BIM/FAM) for each feature being analyzed.
+
+GENE_BED="../_h/gene.bed"
+FEATURE="../_h/dRFE_predictive_features.txt.gz"
+
+## Extract all genes that are on chromosomes 1-23
+grep -f <(zcat $FEATURE | cut -f1) $GENE_BED | grep -v chrM | \
+    parallel --jobs 16 bash ../_h/extract_snps.sh {}
