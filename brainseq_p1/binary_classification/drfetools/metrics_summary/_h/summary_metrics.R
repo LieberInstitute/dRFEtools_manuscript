@@ -74,10 +74,10 @@ extract_n_save <- function(){
         nf = filter(summary_max_data(diagnosis), Test == "n_features")$Median
         nfr = filter(summary_redundant_data(diagnosis),
                      Test == "n_redundant")$Median
-        dat0 = extract_rank(diagnosis) %>% filter(Rank < nf) %>%
+        dat0 = extract_rank(diagnosis) %>% filter(Rank <= nf) %>%
             mutate(Diagnosis=diagnosis)
         dat1 <- summary_max_data(diagnosis)
-        dat2 = extract_rank(diagnosis) %>% filter(Rank < nfr) %>%
+        dat2 = extract_rank(diagnosis) %>% filter(Rank <= nfr) %>%
             mutate(Diagnosis=diagnosis)
         dat3 <- summary_redundant_data(diagnosis)
         pred_featlist[[diagnosis]] <- dat0
