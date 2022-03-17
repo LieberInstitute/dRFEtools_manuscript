@@ -50,9 +50,10 @@ prep_data <- function(){
                 "_m/dlpfc_polyA_brainseq_phase1_hg38_rseGene_merged_n732.rda")
     load(fn)
     rse_df = rse_gene
-    keepIndex = which(rse_df$Age > 17 & rse_df$Race %in% c("AA", "CAUC"))
+    keepIndex = which(rse_df$Age > 17 & rse_df$Race %in% c("AA", "CAUC") &
+                      rse_df$Dx %in% c("Control", "MDD", "Schizo"))
     rse_df = rse_df[, keepIndex]
-    rse_df$Dx = factor(rse_df$Dx, levels = c("Control", "Bipolar", "MDD", "Schizo"))
+    rse_df$Dx = factor(rse_df$Dx, levels = c("Control", "MDD", "Schizo"))
     rse_df$Sex <- factor(rse_df$Sex)
     colData(rse_df)$RIN = sapply(colData(rse_df)$RIN,"[",1)
     rownames(colData(rse_df)) <- sapply(strsplit(rownames(colData(rse_df)), "_"),
@@ -137,7 +138,7 @@ cal_res <- function(){
                                         # Calculate residuals
     v          <- memVOOM()
     null_model <- v$design %>% as.data.frame %>%
-        select(-c("MDD", "Bipolar", "Schizo")) %>% as.matrix
+        select(-any_of(c("MDD", "Bipolar", "Schizo"))) %>% as.matrix
     fit_res    <- limma::lmFit(v, design=null_model)
     res        <- v$E - ( fit_res$coefficients %*% t(null_model) )
     res_sd     <- apply(res, 1, sd)
