@@ -5,6 +5,7 @@ import functools
 import numpy as np
 import pandas as pd
 from os import environ
+from pybiomart import Dataset
 from collections import Counter
 from scipy.stats import fisher_exact
 from statsmodels.stats.multitest import multipletests
@@ -17,30 +18,43 @@ from goatools.anno.genetogo_reader import Gene2GoReader
 from goatools.goea.go_enrichment_ns import GOEnrichmentStudyNS
 
 @functools.lru_cache()
-def get_degs():
-    return pd.read_csv("../../../../mdd_analysis/differential_analysis/_m/diffExpr_CTLvsMDD_full.txt",
+def get_database():
+    dataset = Dataset(name="hsapiens_gene_ensembl",
+                      host="http://www.ensembl.org",
+                      use_cache=True)
+    db = dataset.query(attributes=["ensembl_gene_id",
+                                   "external_gene_name",
+                                   "entrezgene_id"],
+                       use_attr_names=True).dropna(subset=['entrezgene_id'])
+    return db
+
+
+@functools.lru_cache()
+def get_res():
+    return pd.read_csv("../../../_m/residualized_expression.tsv",
                        sep='\t', index_col=0)
 
 
 @functools.lru_cache()
-def get_predictive():
-    df = pd.read_csv("../../metrics_summary/_m/dRFE_predictive_features.txt.gz",
-                     sep='\t')
-    return df[(df["Method"] == "RF")].copy()
+def get_background():
+    df = get_res()
+    df["ensembl_gene_id"] = df.index.str.replace("\\..*", "", regex=True)
+    df["Geneid"] = df.index
+    return pd.merge(get_database(), df.loc[:, ["Geneid", "ensembl_gene_id"]],
+                    on="ensembl_gene_id")
 
 
 @functools.lru_cache()
 def get_redundant():
-    df = pd.read_csv("../../metrics_summary/_m/dRFE_redundant_features.txt.gz",
-                     sep='\t')
-    return df[(df["Method"] == "RF")].copy()
+    return pd.read_csv("../../metrics_summary/_m/dRFE_redundant_features.txt.gz",
+                       sep='\t')
 
 
+@functools.lru_cache()
 def convert2entrez():
-    background = get_degs().dropna(subset=['EntrezID'])
-    features = get_degs().merge(get_predictive(), left_index=True,
-                                right_on="Geneid")\
-                         .dropna(subset=["EntrezID"])
+    background = get_background().dropna(subset=['entrezgene_id'])
+    features = get_background().merge(get_redundant(), on="Geneid")\
+                               .dropna(subset=["entrezgene_id"])
     return background, features
 
 
@@ -57,7 +71,7 @@ def obo_annotation(alpha=0.05):
     for nspc, id2gos in ns2assoc.items():
         print("{NS} {N:,} annotated human genes".format(NS=nspc, N=len(id2gos)))
     goeaobj = GOEnrichmentStudyNS(
-        bg['EntrezID'], # List of human genes with entrez IDs
+        bg['entrezgene_id'], # List of human genes with entrez IDs
         ns2assoc, # geneid/GO associations
         obodag, # Ontologies
         propagate_counts = False,
@@ -68,7 +82,8 @@ def obo_annotation(alpha=0.05):
 
 def run_goea():
     _, df = convert2entrez()
-    geneids_study = {z[0]:z[1] for z in zip(df['EntrezID'], df['Symbol'])}
+    geneids_study = {z[0]:z[1] for z in zip(df['entrezgene_id'],
+                                            df['external_gene_name'])}
     goeaobj = obo_annotation()
     goea_results_all = goeaobj.run_study(geneids_study)
     goea_results_sig = [r for r in goea_results_all if r.p_fdr_bh < 0.05]

@@ -2,5 +2,4 @@
 
 GTF="/ceph/genome/human/gencode25/gtf.CHR/_m/gencode.v25.annotation.gtf"
 
-python ../_h/lr_rfe.py --voom_file "../../_m/voomSVA.RData" --gtf_file $GTF
 python ../_h/rf_rfe.py --voom_file "../../_m/voomSVA.RData" --gtf_file $GTF

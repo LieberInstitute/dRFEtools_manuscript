@@ -76,7 +76,7 @@ def R_function():
     expression_train = expr[, train_indices]
                     # Null model
     null_model_train = v$design[train_index, ] %>% as.data.frame %>%
-        select(-c("MDD", "Schizo", "Bipolar")) %>% as.matrix
+        select(-any_of(c("MDD", "Schizo", "Bipolar"))) %>% as.matrix
                     # Fit model
     fit_train = limma::lmFit(expression_train, design=null_model_train)
                     # Calculate residuals from training data
@@ -89,7 +89,7 @@ def R_function():
     expression_test = expr[, test_indices]
                     # Null model
     null_model_test = v$design[test_indices, ] %>% as.data.frame %>%
-        select(-c("MDD", "Schizo", "Bipolar")) %>% as.matrix
+        select(-any_of(c("MDD", "Schizo", "Bipolar"))) %>% as.matrix
                     # Apply training to test data and normalize
     residuals_test = expression_test - (fit_train$coefficients %*% t(null_model_test))
     residuals_test_norm = (residuals_test - residuals_train_mean) / residuals_train_sd

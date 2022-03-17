@@ -49,14 +49,16 @@ summary_redundant_data <- function(method){
 }
 
 
-extract_ml_data <- function(method, MAX=TRUE){
-    ml_file = paste0("../../_m/", tolower(method), "/dRFEtools_10folds.txt")
+extract_ml_data <- function(MAX=TRUE){
+    ml_file = "../../_m/rf/dRFEtools_10folds.txt"
     if(MAX){
         ml_df2 = data.table::fread(ml_file) %>% mutate_at("fold", as.character) %>%
             select(fold, test_roc)
+        method = "Minimal"
     } else {
         ml_df2 = data.table::fread(ml_file) %>% mutate_at("fold", as.character) %>%
             select(fold, test_roc_redundant)
+        method = "Redundant"
     }
     ml_df1 = data.table::fread(ml_file) %>% mutate_at("fold", as.character) %>%
         select(fold, train_roc) %>% mutate(Method=method, Type="Train") %>%
@@ -68,38 +70,24 @@ extract_ml_data <- function(method, MAX=TRUE){
 
 
 extract_n_save <- function(){
-    maxlist = list(); pred_featlist = list();
-    redund_list1 = list(); redund_list2 = list()
-    for(method in c("RF", "LR")){
-        nf = filter(summary_max_data(method), Test == "n_features")$Median
-        nfr = filter(summary_redundant_data(method),
-                     Test == "n_redundant")$Median
-        dat0 = extract_rank(method) %>% filter(Rank < nf) %>%
-            mutate(Method=method)
-        dat1 <- summary_max_data(method)
-        dat2 = extract_rank(method) %>% filter(Rank < nfr) %>%
-            mutate(Method=method)
-        dat3 <- summary_redundant_data(method)
-        pred_featlist[[method]] <- dat0
-        maxlist[[method]] <- dat1
-        redund_list1[[method]] <- dat2
-        redund_list2[[method]] <- dat3
-    }
-    bind_rows(pred_featlist) %>%
+    nf = filter(summary_max_data("RF"), Test == "n_features")$Median
+    nfr = filter(summary_redundant_data("RF"),Test == "n_redundant")$Median
+    extract_rank("RF") %>% filter(Rank <= nf) %>%
         data.table::fwrite("dRFE_predictive_features.txt.gz", sep='\t')
-    bind_rows(maxlist) %>%
-        data.table::fwrite("dRFE_minimal_subset_summary.txt", sep='\t')
-    bind_rows(redund_list1) %>%
+    extract_rank("RF") %>% filter(Rank <= nfr) %>%
         data.table::fwrite("dRFE_redundant_features.txt.gz", sep='\t')
-    bind_rows(redund_list2) %>%
+    summary_max_data("RF") %>%
+        data.table::fwrite("dRFE_minimal_subset_summary.txt", sep='\t')
+    summary_redundant_data("RF") %>%
         data.table::fwrite("dRFE_redundant_subset_summary.txt", sep='\t')
 }
 
 
-plot_n_save <- function(MAX){
+plot_n_save <- function(){
     datalist = list()
-    for(method in c("RF", "LR")){
-        datalist[[method]] <- extract_ml_data(method, MAX)
+    max_lt = c(TRUE, FALSE)
+    for(MAX in seq_along(max_lt)){
+        datalist[[MAX]] <- extract_ml_data(max_lt[MAX])
     }
     dt = bind_rows(datalist) %>% mutate_if(is.character, as.factor) %>%
         mutate(Type=factor(Type, levels=c("Train", "Test")))
@@ -109,19 +97,14 @@ plot_n_save <- function(MAX){
                     legend="bottom", add.params=list(alpha=0.5), ylim=c(0.5, 1),
                     ggtheme=theme_pubr(base_size=20, border=TRUE)) +
         geom_hline(yintercept=0.85, linetype=2) + rotate_x_text(45)
-    if(MAX){
-        fn = "model_accuracy_plot"
-    } else {
-        fn = "model_accuracy_plot_redundant"
-    }
+    fn = "model_roc_plot"
     save_plot(bxp, fn, 3, 5)
 }
 
 ##### MAIN #######
 main <- function(){
     extract_n_save()
-    plot_n_save(TRUE)
-    plot_n_save(FALSE)
+    plot_n_save()
 }
 
 main()
