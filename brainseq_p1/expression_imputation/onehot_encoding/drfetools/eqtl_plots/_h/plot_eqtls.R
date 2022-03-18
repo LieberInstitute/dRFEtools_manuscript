@@ -118,7 +118,24 @@ plot_simple_eqtl <- function(fn, gene_id, variant_id, eqtl_annot){
         font("xy.title", face="bold") +
         ggtitle(paste(get_gene_symbol(gene_id),gene_id,eqtl_annot,sep='\n')) +
         theme(plot.title = element_text(hjust = 0.5, face="bold"))
-    print(bxp)
+    ##print(bxp)
+    save_ggplots(fn, bxp, 7, 7)
+}
+
+plot_simple_eqtl_dx <- function(fn, gene_id, variant_id, eqtl_annot){
+    y0 = quantile(memDF(variant_id,gene_id)[[gene_id]],probs=c(0.01))[[1]] - 0.2
+    y1 = quantile(memDF(variant_id,gene_id)[[gene_id]],probs=c(0.99))[[1]] + 0.2
+    bxp = memDF(variant_id, gene_id) %>%
+        ggboxplot(x="ID", y=gene_id, fill="Dx", color="Dx", add="jitter",
+                  xlab=variant_id,ylab="Residualized Expression",outlier.shape=NA,
+                  add.params=list(alpha=0.5), alpha=0.4, legend="bottom",
+                  palette="npg", ylim=c(y0,y1),
+                  ggtheme=theme_pubr(base_size=20, border=TRUE)) +
+        font("xy.title", face="bold") +
+        ggtitle(paste(get_gene_symbol(gene_id),gene_id,eqtl_annot,sep='\n')) +
+        theme(plot.title = element_text(hjust = 0.5, face="bold"))
+    ##print(bxp)
+    fn = paste(fn, "BYdiagnosis", sep="_")
     save_ggplots(fn, bxp, 7, 7)
 }
 
@@ -131,6 +148,7 @@ for(num in seq_along(eGenes$gene_id)){
     eqtl_annot = paste("Test R2: ", signif(r2_score, 2))
     fn = paste(eGenes$Feature[num],"eqtl", sep="_")
     plot_simple_eqtl(fn, gene_id, variant_id, eqtl_annot)
+    plot_simple_eqtl_dx(fn, gene_id, variant_id, eqtl_annot)
 }
 
 #### Reproducibility information ####
