@@ -1,0 +1,5 @@
+#!/bin/bash
+
+Rscript ../_h/summary_metrics.R
+awk -F'\t' 'NR==1; $4 > 0.1 && $2=="test_r2"' dRFE_minimal_subset_summary.txt | \
+    column -t > summary.log
