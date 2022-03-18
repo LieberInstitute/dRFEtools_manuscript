@@ -1,0 +1,14 @@
+#!/bin/bash
+
+SNPS="../../metrics_summary/_m/dRFE_predictive_features.txt.gz"
+GENOTYPES="/ceph/projects/brainseq/genotype/download/topmed/imputation_filter/convert2plink/filter_maf_01/_m"
+
+cat ../../metrics_summary/_m/summary.log | cut -f1 -d" " | grep -v Feature | \
+    while read -r GENEID
+    do
+        echo $GENEID
+        zcat $SNPS | grep $GENEID | cut -f2 > pred.snps
+        /ceph/opt/plink-ng/1.9/plink \
+            --bfile $GENOTYPES/LIBD_Brain_TopMed \
+            --r2 --extract pred.snps --out $GENEID
+    done
