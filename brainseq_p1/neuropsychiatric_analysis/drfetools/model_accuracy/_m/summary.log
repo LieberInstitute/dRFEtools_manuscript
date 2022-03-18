@@ -1,0 +1,33 @@
+========================================================================= 
+Log Path: summary.log 
+[1] "Program Path: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/neuropsychiatric_analysis/drfetools/model_accuracy/_h/acc_summary.R"
+[1] "Working Directory: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/neuropsychiatric_analysis/drfetools/model_accuracy/_m"
+User Name: jbenja13 
+R Version: 4.1.2 (2021-11-01) 
+Machine: qvm6 x86_64 
+Operating System: Linux 5.15.5-arch1-1 #1 SMP PREEMPT Thu, 25 Nov 2021 22:09:33 +0000 
+[1] "Base Packages: stats graphics grDevices utils datasets methods base\nOther Packages: ggpubr_0.4.0 ggplot2_3.3.5 dplyr_1.0.8 logr_1.2.9 "
+Log Start Time: 2022-03-18 08:58:39 
+========================================================================= 
+
+Summary of accuracy by diagnosis: 
+
+NOTE: Log Print Time:  2022-03-18 08:58:39 
+NOTE: Elapsed Time in seconds: 0.0666453838348389 
+
+# A tibble: 3 × 5
+  Diagnosis   Acc   FDR F1_score   TNR
+  <chr>     <dbl> <dbl>    <dbl> <dbl>
+1 CTL       0.702 0.404    0.651 0.688
+2 MDD       0.837 0.249    0.678 0.921
+3 SZ        0.740 0.394    0.528 0.812
+
+NOTE: Data frame has 3 rows and 5 columns. 
+
+NOTE: Log Print Time:  2022-03-18 08:58:40 
+NOTE: Elapsed Time in seconds: 0.940798759460449 
+
+========================================================================= 
+Log End Time: 2022-03-18 08:58:41 
+Log Elapsed Time: 0 00:00:01 
+========================================================================= 

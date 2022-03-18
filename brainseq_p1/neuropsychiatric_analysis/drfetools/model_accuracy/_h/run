@@ -1,0 +1,4 @@
+#!/bin/bash
+
+python ../_h/generate_accuracy.py
+Rscript ../_h/acc_summary.R
