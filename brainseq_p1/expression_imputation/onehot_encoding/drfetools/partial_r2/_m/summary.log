@@ -1,0 +1,53 @@
+========================================================================= 
+Log Path: summary.log 
+[1] "Program Path: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/expression_imputation/onehot_encoding/drfetools/partial_r2/_h/partial_r2.R"
+[1] "Working Directory: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/expression_imputation/onehot_encoding/drfetools/partial_r2/_m"
+User Name: jbenja13 
+R Version: 4.1.2 (2021-11-01) 
+Machine: qvm6 x86_64 
+Operating System: Linux 5.15.5-arch1-1 #1 SMP PREEMPT Thu, 25 Nov 2021 22:09:33 +0000 
+[1] "Base Packages: stats graphics grDevices utils datasets methods base\nOther Packages: limma_3.50.1 forcats_0.5.1 stringr_1.4.0 dplyr_1.0.8 purrr_0.3.4\n                readr_2.1.2 tidyr_1.2.0 tibble_3.1.6 ggplot2_3.3.5 tidyverse_1.3.1"
+Log Start Time: 2022-03-18 11:39:57 
+========================================================================= 
+
+Summary of correlation between Rank and Partial r2: 
+
+NOTE: Log Print Time:  2022-03-18 11:39:58 
+NOTE: Elapsed Time in seconds: 0.308258771896362 
+
+# A tibble: 3 × 2
+  p.bonf.cat     n
+  <fct>      <int>
+1 <= 0.005       3
+2 <= 0.01        1
+3 > 0.05         2
+
+NOTE: Data frame has 3 rows and 2 columns. 
+
+NOTE: Log Print Time:  2022-03-18 11:39:58 
+NOTE: Elapsed Time in seconds: 0.441679716110229 
+
+             gene_id term      estimate    std.error statistic      p.value
+1 ENSG00000074803.17 Rank -0.0016635647 0.0006523689 -2.550037 0.0127305712
+2  ENSG00000226278.1 Rank -0.0004603125 0.0001736990 -2.650058 0.0091232111
+3  ENSG00000263667.1 Rank -0.0005767763 0.0001632713 -3.532626 0.0007444530
+4  ENSG00000272977.1 Rank -0.0012398849 0.0003421884 -3.623399 0.0005877483
+5  ENSG00000274512.5 Rank -0.0022103739 0.0006384481 -3.462104 0.0012450300
+6  ENSG00000280693.2 Rank -0.0007246770 0.0001860422 -3.895230 0.0001518466
+        p.bonf p.bonf.sig p.bonf.cat        p.fdr log.p.bonf
+1 0.0763834273      FALSE     > 0.05 0.0127305712   1.117001
+2 0.0547392667      FALSE     > 0.05 0.0109478533   1.261701
+3 0.0044667181       TRUE   <= 0.005 0.0014889060   2.350011
+4 0.0035264899       TRUE   <= 0.005 0.0014889060   2.452657
+5 0.0074701802       TRUE    <= 0.01 0.0018675451   2.126669
+6 0.0009110793       TRUE   <= 0.005 0.0009110793   3.040444
+
+NOTE: Data frame has 6 rows and 11 columns. 
+
+NOTE: Log Print Time:  2022-03-18 11:40:08 
+NOTE: Elapsed Time in seconds: 9.35868096351624 
+
+========================================================================= 
+Log End Time: 2022-03-18 11:40:08 
+Log Elapsed Time: 0 00:00:10 
+========================================================================= 
