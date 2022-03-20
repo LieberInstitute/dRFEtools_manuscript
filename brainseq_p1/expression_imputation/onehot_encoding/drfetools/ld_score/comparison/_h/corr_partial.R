@@ -25,13 +25,19 @@ logr::log_print("Summary of partial r2")
 df1 <- get_partial() %>% group_by(Feature) %>%
     summarize(Max_Variance=max(Partial_R2), N_SNPS=n())
 logr::log_print(df1)
-logr::log_print("Summary of features with LD r2 > 0.8")
-df2 <- get_ld() %>% filter(R2 > 0.8) %>% group_by(Feature) %>%
+logr::log_print("Summary of features with LD r2 > 0.6")
+df3 <- get_ld() %>% filter(R2 > 0.6) %>% group_by(Feature) %>%
     summarize(LD_SNPS=n())
+logr::log_print(df3)
+logr::log_print("Summary of features with high LD r2 > 0.8")
+df2 <- get_ld() %>% filter(R2 > 0.8) %>% group_by(Feature) %>%
+    summarize(HIGH_LD_SNPS=n())
 logr::log_print(df2)
 logr::log_print("Table 1: Expression Imputation Results:")
-logr::log_print(inner_join(df1, df2, by="Feature") %>%
-                mutate(Percent_LD=LD_SNPS/N_SNPS))
+df <- df1 %>% inner_join(df2, by="Feature") %>%
+    inner_join(df3, by="Feature") %>%
+    mutate(Percent_LD=LD_SNPS/N_SNPS, Percent_hLD=HIGH_LD_SNPS/N_SNPS)
+logr::log_print(df)
 logr::log_print("Summary of high partial r2, LD:")
 high_corr <- get_partial() %>% filter(Partial_R2 > 0.5) %>%
     select(Feature, SNP, Partial_R2)
