@@ -1,0 +1,21 @@
+#!/bin/bash
+## Author: Kynon J Benjamin
+##
+## This script runs conversion to onehot encoding in parallel.
+##
+## Input: Feature annotation and features to select.
+##
+## Output: Onehot encoded text file of SNPs for each features.
+
+GENE_BED="../../../_h/gene.bed"
+FEATURE="../../../_h/dRFE_predictive_features.txt.gz"
+
+echo "Starting... "`date +"%Y-%m-%d at %T"`
+
+grep -f <(zcat $FEATURE | cut -f1) $GENE_BED | \
+    parallel --jobs 16 bash ../_h/prep_data.sh {}
+
+mkdir log_files
+ls -d ../_m/ENSG*/ | parallel --jobs 10 bash ../_h/drfe_run_script.sh {}
+
+echo "Ending... "`date +"%Y-%m-%d at %T"`
