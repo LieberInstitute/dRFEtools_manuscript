@@ -30,7 +30,7 @@ memPHENO <- memoise::memoise(get_pheno_df)
 get_genotypes <- function(){
     traw_file = paste0("/ceph/projects/brainseq/genotype/download/topmed/",
                        "imputation_filter/convert2plink/filter_maf_01/",
-                       "a_transpose/_m/LIBD_Brain_TopMed.traw")
+                       "unique_a_transpose/_m/LIBD_Brain_TopMed.traw")
     traw = data.table::fread(traw_file) %>% rename_with(~ gsub('\\_.*', '', .x))
     return(traw)
 }
@@ -122,6 +122,23 @@ plot_simple_eqtl <- function(fn, gene_id, variant_id, eqtl_annot){
     save_ggplots(fn, bxp, 7, 7)
 }
 
+plot_simple_eqtl_pheno <- function(fn, gene_id, variant_id, eqtl_annot){
+    y0 = quantile(memDF(variant_id,gene_id)[[gene_id]],probs=c(0.01))[[1]] - 0.2
+    y1 = quantile(memDF(variant_id,gene_id)[[gene_id]],probs=c(0.99))[[1]] + 0.2
+    bxp = memDF(variant_id, gene_id) %>%
+        ggboxplot(x="ID", y=gene_id, fill="Dx", color="Dx", add="jitter",
+                  xlab=variant_id,ylab="Residualized Expression",outlier.shape=NA,
+                  add.params=list(alpha=0.5), alpha=0.4, legend="bottom",
+                  palette="npg", ylim=c(y0,y1),
+                  ggtheme=theme_pubr(base_size=20, border=TRUE)) +
+        font("xy.title", face="bold") +
+        ggtitle(paste(get_gene_symbol(gene_id),gene_id,eqtl_annot,sep='\n')) +
+        theme(plot.title = element_text(hjust = 0.5, face="bold"))
+    ##print(bxp)
+    fn = paste(fn, "diagnosis", sep="_")
+    save_ggplots(fn, bxp, 7, 7)
+}
+
 ###### MAIN
 eGenes <- memEQTL() %>% arrange(Rank) %>% group_by(gene_id) %>% slice(1)
 for(num in seq_along(eGenes$gene_id)){
@@ -131,6 +148,7 @@ for(num in seq_along(eGenes$gene_id)){
     eqtl_annot = paste("Test R2: ", signif(r2_score, 2))
     fn = paste(eGenes$Feature[num],"eqtl", sep="_")
     plot_simple_eqtl(fn, gene_id, variant_id, eqtl_annot)
+    plot_simple_eqtl_pheno(fn, gene_id, variant_id, eqtl_annot)
 }
 
 #### Reproducibility information ####
