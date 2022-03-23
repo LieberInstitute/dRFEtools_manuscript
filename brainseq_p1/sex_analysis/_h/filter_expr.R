@@ -105,10 +105,18 @@ memQSV <- memoise::memoise(cal_qSV)
 qSV_model <- function(diagnosis){
     x <- memPREP(diagnosis)
                                         # Design matrix
-    mod = model.matrix(~Sex + Age + RIN + mitoRate + rRNA_rate +
-                           overallMapRate + Adapter70.71_R2 + percentGC_R1 +
-                           percentGC_R2 + snpPC1 + snpPC2 + snpPC3,
-                       data=x$samples)
+    if(diagnosis == "Bipolar"){
+        ## percentGC_R1 and percentGC_R2 highly correlated in BD
+        mod = model.matrix(~Sex + Age + RIN + mitoRate + rRNA_rate +
+                               overallMapRate + Adapter70.71_R2 +
+                               percentGC_R2 + snpPC1 + snpPC2 + snpPC3,
+                           data=x$samples)
+    } else {
+        mod = model.matrix(~Sex + Age + RIN + mitoRate + rRNA_rate +
+                               overallMapRate + Adapter70.71_R2 + percentGC_R1 +
+                               percentGC_R2 + snpPC1 + snpPC2 + snpPC3,
+                           data=x$samples)
+    }
     colnames(mod) <- gsub("SexM", "Male", colnames(mod))
     colnames(mod) <- gsub("\\(Intercept\\)", "Intercept", colnames(mod))
                                         # Load qSV
@@ -149,7 +157,7 @@ memRES <- memoise::memoise(cal_res)
 
 #### MAIN ####
 main <- function(){
-    for(diagnosis in c("Control", "MDD")){
+    for(diagnosis in c("Control", "MDD", "Bipolar", "Schizo")){
         dir.create(tolower(diagnosis))
                                         # Run voom normalization
         v <- memVOOM(diagnosis)

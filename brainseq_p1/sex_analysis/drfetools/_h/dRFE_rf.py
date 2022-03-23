@@ -201,10 +201,11 @@ def main_loop(args):
     ''')
     cla = dRFEtools.RandomForestClassifier(n_estimators=100,
                                            oob_score=True,
-                                           n_jobs=args.threads)
+                                           n_jobs=args.threads,
+                                           random_state=20220214)
     X = r['expr'].T
     Y = r['model'].Sex.astype("int64")
-    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=20211119)
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=20220214)
     skf.get_n_splits(X, Y)
     optimize_rf(X, Y, cla, skf, outdir)
     frac = 0.30; step_size = 0.03; fold = 0

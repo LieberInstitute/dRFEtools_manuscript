@@ -3,7 +3,7 @@
 THREADS=32
 ANNOT="/ceph/projects/v4_phase3_paper/inputs/counts/text_files_counts/_m/caudate/gene_annotation.tsv"
 
-for DX in Control MDD; do
+for DX in Control MDD Schizo Bipolar; do
     echo "${DX,,}"
     VOOM="../../_m/${DX,,}/voomSVA.RData"
     python ../_h/dRFE_rf.py \
