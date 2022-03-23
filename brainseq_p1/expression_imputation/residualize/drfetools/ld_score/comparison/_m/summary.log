@@ -1,0 +1,151 @@
+========================================================================= 
+Log Path: summary.log 
+[1] "Program Path: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/expression_imputation/residualize/drfetools/ld_score/comparison/_h/corr_partial.R"
+[1] "Working Directory: /ceph/users/jbenja13/github_projects/dRFEtools_manuscript/brainseq_p1/expression_imputation/residualize/drfetools/ld_score/comparison/_m"
+User Name: jbenja13 
+R Version: 4.1.2 (2021-11-01) 
+Machine: qvm6 x86_64 
+Operating System: Linux 5.15.5-arch1-1 #1 SMP PREEMPT Thu, 25 Nov 2021 22:09:33 +0000 
+Base Packages: stats graphics grDevices utils datasets methods base
+Other Packages: dplyr_1.0.8  
+Log Start Time: 2022-03-20 21:59:21 
+========================================================================= 
+
+Summary of partial r2 
+
+NOTE: Log Print Time:  2022-03-20 21:59:21 
+NOTE: Elapsed Time in seconds: 0.000431060791015625 
+
+# A tibble: 6 × 3
+  Feature            Max_Variance N_SNPS
+  <chr>                     <dbl>  <int>
+1 ENSG00000074803_17        0.663     45
+2 ENSG00000226278_1         0.392    105
+3 ENSG00000263667_1         0.130     83
+4 ENSG00000272977_1         0.150     45
+5 ENSG00000274512_5         0.276     45
+6 ENSG00000280693_2         0.512     58
+
+NOTE: Data frame has 6 rows and 3 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:21 
+NOTE: Elapsed Time in seconds: 0.176569700241089 
+
+Summary of features with LD r2 > 0.6 
+
+NOTE: Log Print Time:  2022-03-20 21:59:21 
+NOTE: Elapsed Time in seconds: 0.000762224197387695 
+
+# A tibble: 6 × 2
+  Feature            LD_SNPS
+  <chr>                <int>
+1 ENSG00000074803_17       4
+2 ENSG00000226278_1       17
+3 ENSG00000263667_1        5
+4 ENSG00000272977_1       20
+5 ENSG00000274512_5        8
+6 ENSG00000280693_2       16
+
+NOTE: Data frame has 6 rows and 2 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.12440013885498 
+
+Summary of features with high LD r2 > 0.8 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.000888347625732422 
+
+# A tibble: 6 × 2
+  Feature            HIGH_LD_SNPS
+  <chr>                     <int>
+1 ENSG00000074803_17            4
+2 ENSG00000226278_1             7
+3 ENSG00000263667_1             3
+4 ENSG00000272977_1             8
+5 ENSG00000274512_5             5
+6 ENSG00000280693_2            13
+
+NOTE: Data frame has 6 rows and 2 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.088864803314209 
+
+Table 1: Expression Imputation Results: 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.000783205032348633 
+
+# A tibble: 6 × 7
+  Feature        Max_Variance N_SNPS HIGH_LD_SNPS LD_SNPS Percent_LD Percent_hLD
+  <chr>                 <dbl>  <int>        <int>   <int>      <dbl>       <dbl>
+1 ENSG000000748…        0.663     45            4       4     0.0889      0.0889
+2 ENSG000002262…        0.392    105            7      17     0.162       0.0667
+3 ENSG000002636…        0.130     83            3       5     0.0602      0.0361
+4 ENSG000002729…        0.150     45            8      20     0.444       0.178 
+5 ENSG000002745…        0.276     45            5       8     0.178       0.111 
+6 ENSG000002806…        0.512     58           13      16     0.276       0.224 
+
+NOTE: Data frame has 6 rows and 7 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.0761282444000244 
+
+Summary of high partial r2, LD: 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.000876903533935547 
+
+              Feature                        SNP Partial_R2
+1: ENSG00000074803_17         chr15:48207506:C:T  0.6627694
+2: ENSG00000074803_17 chr15:48187412:CAATGTTTG:C  0.6447478
+3: ENSG00000074803_17         chr15:48189468:C:T  0.6392548
+4:  ENSG00000280693_2        chr10:103746702:G:A  0.5123798
+5:  ENSG00000280693_2        chr10:103746736:G:A  0.5123798
+6:  ENSG00000280693_2        chr10:103745196:A:G  0.5099573
+7:  ENSG00000280693_2        chr10:103746464:C:T  0.5123798
+8:  ENSG00000280693_2        chr10:103743743:A:G  0.5123798
+
+NOTE: Data frame has 8 rows and 3 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.0336372852325439 
+
+    CHR_A      BP_A                      SNP_A CHR_B      BP_B
+ 1:    15  48187412 chr15:48187412:CAATGTTTG:C    15  48189468
+ 2:    15  48187412 chr15:48187412:CAATGTTTG:C    15  48207506
+ 3:    15  48189468         chr15:48189468:C:T    15  48207506
+ 4:    10 103743743        chr10:103743743:A:G    10 103745196
+ 5:    10 103743743        chr10:103743743:A:G    10 103746464
+ 6:    10 103743743        chr10:103743743:A:G    10 103746702
+ 7:    10 103743743        chr10:103743743:A:G    10 103746736
+ 8:    10 103745196        chr10:103745196:A:G    10 103746464
+ 9:    10 103745196        chr10:103745196:A:G    10 103746702
+10:    10 103745196        chr10:103745196:A:G    10 103746736
+11:    10 103746464        chr10:103746464:C:T    10 103746702
+12:    10 103746464        chr10:103746464:C:T    10 103746736
+13:    10 103746702        chr10:103746702:G:A    10 103746736
+                  SNP_B       R2            Feature
+ 1:  chr15:48189468:C:T 0.988354 ENSG00000074803_17
+ 2:  chr15:48207506:C:T 0.980603 ENSG00000074803_17
+ 3:  chr15:48207506:C:T 0.976596 ENSG00000074803_17
+ 4: chr10:103745196:A:G 0.993899  ENSG00000280693_2
+ 5: chr10:103746464:C:T 1.000000  ENSG00000280693_2
+ 6: chr10:103746702:G:A 1.000000  ENSG00000280693_2
+ 7: chr10:103746736:G:A 1.000000  ENSG00000280693_2
+ 8: chr10:103746464:C:T 0.993899  ENSG00000280693_2
+ 9: chr10:103746702:G:A 0.993899  ENSG00000280693_2
+10: chr10:103746736:G:A 0.993899  ENSG00000280693_2
+11: chr10:103746702:G:A 1.000000  ENSG00000280693_2
+12: chr10:103746736:G:A 1.000000  ENSG00000280693_2
+13: chr10:103746736:G:A 1.000000  ENSG00000280693_2
+
+NOTE: Data frame has 13 rows and 8 columns. 
+
+NOTE: Log Print Time:  2022-03-20 21:59:22 
+NOTE: Elapsed Time in seconds: 0.0644755363464355 
+
+========================================================================= 
+Log End Time: 2022-03-20 21:59:22 
+Log Elapsed Time: 0 00:00:00 
+========================================================================= 
