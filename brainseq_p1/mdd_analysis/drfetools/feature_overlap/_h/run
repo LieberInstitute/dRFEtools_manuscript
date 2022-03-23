@@ -1,3 +1,0 @@
-#!/bin/bash
-
-Rscript ../_h/examine_overlap.R

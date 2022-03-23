@@ -1,3 +1,0 @@
-#!/bin/bash
-
-Rscript ../_h/filter_expr.R
