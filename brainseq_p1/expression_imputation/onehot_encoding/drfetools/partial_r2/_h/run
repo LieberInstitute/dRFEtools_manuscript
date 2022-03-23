@@ -1,3 +1,0 @@
-#!/bin/bash
-
-Rscript ../_h/partial_r2.R
