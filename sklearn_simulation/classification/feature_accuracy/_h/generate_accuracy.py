@@ -101,7 +101,7 @@ def cal_metrics(df):
     df["N_sum"] = np.cumsum(1 - df.Y_predict)
     tpr = df.Y_sum / np.sum(df.Y_predict)
     fpr = df.N_sum / np.sum(df.Y_predict == 0)
-    return tpr, fpr
+    return tpr, fpr, df.Feature
 
 
 def drfe_accuracy(simu, alg, elim):
@@ -123,10 +123,10 @@ def get_metrics(fnc1, fnc2, label, elim_set):
         for simu in range(10):
             for algorithm in ["lr", "sgd", "svc", "rf"]:
                 tp, fn, tn, fp, cpu = fnc1(simu, algorithm, elim)
-                tpr, fpr = cal_metrics(fnc2(simu, algorithm, elim))
+                tpr, fpr, feature = cal_metrics(fnc2(simu, algorithm, elim))
                 tmp_df = pd.DataFrame({"RFE_Method":label, "Elimination":elim,
                                        "Algorithm":algorithm, "Simulation":simu,
-                                       "TPR":tpr, "FPR":fpr})
+                                       "Feature":feature, "TPR":tpr, "FPR":fpr})
                 dy = pd.concat([dy, tmp_df], axis=0)
                 alg.append(algorithm); elim_lt.append(elim);
                 simu_lt.append(simu); tp_lt.append(tp); cpu_lt.append(cpu)
