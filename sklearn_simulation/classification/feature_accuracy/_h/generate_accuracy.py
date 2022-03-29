@@ -2,7 +2,9 @@
 Gnerate the accuracy results for each fold, model, and algorithm.
 """
 import functools
+import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_curve
 from sklearn.datasets import make_classification
 
 
@@ -23,6 +25,18 @@ def get_features(simu):
     true = features[:n_informative + n_redundant + n_repeated]
     false = features[n_informative + n_redundant + n_repeated:]
     return true, false
+
+
+def rfe_roc_curve(simu, algorithm, elim):
+    true, false = get_features(simu)
+    fn = "../../_m/%s/RFECV_%.2f_predictions.txt" % (algorithm, elim)
+    df0 = pd.read_csv(fn, sep='\t')
+    df0 = df0[(df0["Simulation"] == simu)].copy()
+    df1 = pd.DataFrame({"Feature": [x for x in df0.Feature],
+                        "Y_predict": [int(x) for x in df0.Predictive]})
+    df2 = pd.concat([pd.DataFrame({"Feature":true, "Y_test":1}),
+                     pd.DataFrame({"Feature":false, "Y_test":0})], axis=0)
+    return pd.merge(df2, df1, on="Feature")
 
 
 def rfe_accuracy(simu, algorithm, elim):
@@ -69,6 +83,27 @@ def get_drfe_cpuTime(elim, simu, alg):
     return df[(df["Simulation"] == simu)].loc[:, "CPU Time"]
 
 
+def drfe_roc_curve(simu, alg, elim):
+    true, false = get_features(simu)
+    n_features, n_max, n_redundant = get_n_features(elim, simu, alg)
+    df0 = get_ranked_features(elim, simu, alg)
+    pred_true = df0[(df0["Rank"] <= n_features)].Feature
+    pred_false = df0[(df0["Rank"] > n_features)].Feature
+    df1 = pd.concat([pd.DataFrame({"Feature":pred_true, "Y_predict":1}),
+                     pd.DataFrame({"Feature":pred_false,"Y_predict":0})],axis=0)
+    df2 = pd.concat([pd.DataFrame({"Feature":true, "Y_test":1}),
+                     pd.DataFrame({"Feature":false, "Y_test":0})], axis=0)
+    return pd.merge(df2, df1, on="Feature")
+
+
+def cal_metrics(df):
+    df["Y_sum"] = np.cumsum(df.Y_predict)
+    df["N_sum"] = np.cumsum(1 - df.Y_predict)
+    tpr = df.Y_sum / np.sum(df.Y_predict)
+    fpr = df.N_sum / np.sum(df.Y_predict == 0)
+    return tpr, fpr
+
+
 def drfe_accuracy(simu, alg, elim):
     true, false = get_features(simu)
     n_features, n_max, n_redundant = get_n_features(elim, simu, alg)
@@ -81,26 +116,34 @@ def drfe_accuracy(simu, alg, elim):
     return TP, FN, TN, FP, cpu
 
 
-def get_metrics(fnc, label, elim_set):
+def get_metrics(fnc1, fnc2, label, elim_set):
     alg = []; elim_lt = []; simu_lt = []; cpu_lt = [];
-    tp_lt = []; fn_lt = []; tn_lt = []; fp_lt = [];
+    tp_lt = []; fn_lt = []; tn_lt = []; fp_lt = []; dy = pd.DataFrame();
     for elim in elim_set:
         for simu in range(10):
             for algorithm in ["lr", "sgd", "svc", "rf"]:
-                tp, fn, tn, fp, cpu = fnc(simu, algorithm, elim)
+                tp, fn, tn, fp, cpu = fnc1(simu, algorithm, elim)
+                tpr, fpr = cal_metrics(fnc2(simu, algorithm, elim))
+                tmp_df = pd.DataFrame({"RFE_Method":label, "Elimination":elim,
+                                       "Algorithm":algorithm, "Simulation":simu,
+                                       "TPR":tpr, "FPR":fpr})
+                dy = pd.concat([dy, tmp_df], axis=0)
                 alg.append(algorithm); elim_lt.append(elim);
                 simu_lt.append(simu); tp_lt.append(tp); cpu_lt.append(cpu)
-                fn_lt.append(fn), tn_lt.append(tn); fp_lt.append(fp)
-    return pd.DataFrame({"RFE_Method": label, "Elimination": elim_lt,
-                         "Algorithm": alg, "Simulation": simu_lt, "TP": tp_lt,
-                         "FN": fn_lt, "TN": tn_lt, "FP": fp_lt, "CPU": cpu_lt})
+                fn_lt.append(fn); tn_lt.append(tn); fp_lt.append(fp)
+    dx = pd.DataFrame({"RFE_Method": label, "Elimination": elim_lt,
+                       "Algorithm": alg, "Simulation": simu_lt, "TP": tp_lt,
+                       "FN": fn_lt, "TN": tn_lt, "FP": fp_lt, "CPU": cpu_lt})
+    return dx, dy
 
 
 def main():
-    dt1 = get_metrics(rfe_accuracy, "RFE", [0.1, 100])
-    dt2 = get_metrics(drfe_accuracy, "dRFE", [0.1, 0.2])
+    dt1, dx1 = get_metrics(rfe_accuracy, rfe_roc_curve, "RFE", [0.1, 100])
+    dt2, dx2 = get_metrics(drfe_accuracy, drfe_roc_curve, "dRFE", [0.1, 0.2])
     pd.concat([dt1, dt2], axis=0)\
       .to_csv("simulated_data_accuracy_metrics.tsv", sep='\t', index=False)
+    pd.concat([dx1, dx2], axis=0)\
+      .to_csv("simulated_data_roc_metrics.tsv.gz", sep='\t', index=False)
 
 
 if __name__ == "__main__":
