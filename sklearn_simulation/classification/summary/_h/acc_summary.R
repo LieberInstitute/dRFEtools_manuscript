@@ -10,11 +10,16 @@ save_plot <- function(p, fn, w, h){
 }
 
 cal_metrics <- function(){
-    fn = "../../class_acc/_m/simulated_data_accuracy_metrics.tsv"
+    fn = "../../feature_accuracy/_m/simulated_data_accuracy_metrics.tsv"
     return(data.table::fread(fn) %>%
            mutate(ID=paste0(RFE_Method, " (",Elimination,")"),
                   Acc=(TP+TN)/(TP+FN+TN+FP), FDR=(1-(TP/(TP+FP))),
                   F1_score=(2*TP)/(2*TP + FP + FN), TNR=(TN/(FP+TN))))
+}
+
+get_roc_metrics <- function(){
+    fn = "../../feature_accuracy/_m/simulated_data_roc_metrics.tsv.gz"
+    return(data.table::fread(fn))
 }
 
 print_summary <- function(){
@@ -28,6 +33,25 @@ print_summary <- function(){
         group_by(RFE_Method, Elimination, Algorithm) %>%
         summarize_at(vars(c("Acc", "FDR", "F1_score", "TNR", "CPU")), median)
     print(df.median)
+}
+
+plot_roc <- function(){
+    outfile = "roc_curve_feature_selection_simulation"
+    df = get_roc_metrics() %>%
+        mutate(ID=paste0(RFE_Method," (",Elimination,")"),
+               FPR=ifelse(is.na(FPR), TPR, FPR),
+               Algorithm=toupper(Algorithm)) %>%
+        mutate_if(is.character, as.factor) %>%
+        group_by(Feature, ID, Algorithm) %>%
+        summarize_at(vars(c("TPR", "FPR")), median)
+    df$ID <- factor(df$ID,levels=c("RFE (0.1)","RFE (100)","dRFE (0.1)","dRFE (0.2)"))
+    sca = ggscatter(df, x="FPR", y="TPR", color="Algorithm", palette="npg",
+                    facet.by="ID", legend="bottom", add.params=list(alpha=0.5),
+                    ncol=4, panel.labs.font=list(face="bold"),
+                    xlab="Specificity (FPR)", ylab="Sensitivity (TPR)",
+                    ggtheme=theme_pubr(base_size=15, border=TRUE)) +
+        font("xylab", face="bold")
+    save_plot(sca, outfile, 12, 4)
 }
 
 plot_metrics <- function(metric, ylab){
@@ -46,6 +70,7 @@ print_summary()
 plot_metrics("Acc", "Accuracy")
 plot_metrics("FDR", "False Discovery Rate")
 plot_metrics("CPU", "Computational Time")
+plot_roc()
 
 ## Reproducibility information
 Sys.time()
