@@ -1,2 +1,2 @@
 # dRFEtools_manuscript
-manuscript for dRFEtools
+This repository contains the code for the dRFEtools manuscript.
