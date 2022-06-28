@@ -1,7 +1,7 @@
 #!/bin/sh
 #$ -cwd
 #$ -R y
-#$ -l mem_free=10.0G,h_vmem=10G,h_fsize=50G
+#$ -l h_fsize=50G
 #$ -N 'drfetools_optimization'
 #$ -o ./summary.out
 #$ -e ./summary.out
@@ -18,6 +18,7 @@ echo "Job id: ${JOB_ID}"
 echo "Job name: ${JOB_NAME}"
 echo "Hostname: ${HOSTNAME}"
 
+module load tex
 module load pandoc
 module load R/4.0.3
 module list
