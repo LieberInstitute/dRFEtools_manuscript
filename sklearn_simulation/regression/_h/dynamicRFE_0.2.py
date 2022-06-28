@@ -25,8 +25,8 @@ def mkdir_p(directory):
 def load_data(simu):
     state = 13 + simu
     X, y = make_regression(
-        n_samples=500, n_features=20000, n_informative=200, bias=0.2,
-        n_targets=1, noise=0.5, random_state=state, shuffle=False,
+        n_samples=500, n_features=20000, n_informative=400, bias=0.2,
+        n_targets=1, noise=5, random_state=state, shuffle=False,
     )
     return X, y
 
