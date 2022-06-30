@@ -1,7 +1,7 @@
 #!/bin/sh
 #$ -cwd
 #$ -R y
-#$ -l h_fsize=50G
+#$ -l mem_free=10G,h_vmem=10G,h_fsize=50G
 #$ -N 'drfetools_optimization'
 #$ -o ./summary.out
 #$ -e ./summary.out
