@@ -4,7 +4,7 @@ library(dplyr)
 library(ggpubr)
 
 save_plot <- function(p, fn, w, h){
-    for(ext in c(".pdf", ".png", ".svg")){
+    for(ext in c(".pdf", ".svg")){
         ggsave(filename=paste0(fn,ext), plot=p, width=w, height=h)
     }
 }
@@ -45,13 +45,17 @@ plot_roc <- function(){
         group_by(Feature, ID, Algorithm) %>%
         summarize_at(vars(c("TPR", "FPR")), median)
     df$ID <- factor(df$ID,levels=c("RFE (0.1)","RFE (100)","dRFE (0.1)","dRFE (0.2)"))
-    sca = ggscatter(df, x="FPR", y="TPR", color="Algorithm", palette="npg",
-                    facet.by="ID", legend="bottom", add.params=list(alpha=0.5),
-                    ncol=4, panel.labs.font=list(face="bold"),
-                    xlab="Specificity (FPR)", ylab="Sensitivity (TPR)",
-                    ggtheme=theme_pubr(base_size=15, border=TRUE)) +
-        font("xylab", face="bold")
-    save_plot(sca, outfile, 12, 4)
+    pp <- ggplot(df, aes(x=FPR, y=TPR, color=Algorithm)) +
+        geom_line(size=1.5) + facet_wrap("~ID", ncol=4) +
+        labs(x="Specificity (FPR)", y="Sensitivity (TPR)") +
+        scale_color_manual(values=get_palette(palette = "npg", 4)) +
+        ggpubr::theme_pubr(base_size = 15, border=TRUE) +
+        theme(axis.text = element_text(size=12),
+              axis.title = element_text(size=16, face="bold"),
+              strip.text = element_text(face="bold"),
+              legend.position = "bottom",
+              legend.title = element_text(size=16, face="bold"))
+    save_plot(pp, outfile, 12, 4)
 }
 
 plot_metrics <- function(metric, ylab){

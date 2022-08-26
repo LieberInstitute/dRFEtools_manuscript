@@ -1,0 +1,139 @@
+**** Job starts ****
+Thu Aug 25 20:48:40 EDT 2022
+**** JHPCE info ****
+User: jbenjami
+Job id: 1618583
+Job name: metric_summary
+Hostname: compute-127.cm.cluster
+
+Currently Loaded Modules:
+  1) matlab/R2019a     5) gcc/4.4.7                       9) emacs/28.1
+  2) stata/17          6) COMMUNITY_CENTOS7_DEFAULT_ENV  10) R/3.6.1
+  3) JHPCE_tools/1.0   7) JHPCE_CENTOS7_DEFAULT_ENV
+  4) sge/8.1.9         8) python/3.7.3
+
+ 
+
+**** Run summary ****
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: ggplot2
+[1] "Mean:"
+# A tibble: 16 × 8
+# Groups:   RFE_Method, Elimination [4]
+   RFE_Method Elimination Algorithm   Acc    FDR F1_score   TNR     CPU
+   <chr>            <dbl> <chr>     <dbl>  <dbl>    <dbl> <dbl>   <dbl>
+ 1 dRFE               0.1 lr        0.982 0.112    0.150  0.986 1065.  
+ 2 dRFE               0.1 rf        0.997 0.280    0.731  0.997  940.  
+ 3 dRFE               0.1 sgd       0.997 0.0470   0.592  1.00   163.  
+ 4 dRFE               0.1 svc       0.995 0.0825   0.181  1.00   840.  
+ 5 dRFE               0.2 lr        0.876 0.548    0.215  0.877 1029.  
+ 6 dRFE               0.2 rf        0.998 0.147    0.765  0.999  503.  
+ 7 dRFE               0.2 sgd       0.997 0.110    0.657  0.999   93.5 
+ 8 dRFE               0.2 svc       0.989 0.261    0.258  0.993  528.  
+ 9 RFE                0.1 lr        0.904 0.954    0.0875 0.904   80.0 
+10 RFE                0.1 rf        0.885 0.954    0.0880 0.884   41.9 
+11 RFE                0.1 sgd       0.883 0.865    0.0690 0.883    4.34
+12 RFE                0.1 svc       0.904 0.954    0.0867 0.904   89.6 
+13 RFE              100   lr        0.997 0.303    0.697  0.998 1411.  
+14 RFE              100   rf        0.980 0.429    0.584  0.981  761.  
+15 RFE              100   sgd       0.993 0.612    0.418  0.996   51.9 
+16 RFE              100   svc       0.996 0.421    0.579  0.998 1587.  
+[1] "Median:"
+# A tibble: 16 × 8
+# Groups:   RFE_Method, Elimination [4]
+   RFE_Method Elimination Algorithm   Acc    FDR F1_score   TNR     CPU
+   <chr>            <dbl> <chr>     <dbl>  <dbl>    <dbl> <dbl>   <dbl>
+ 1 dRFE               0.1 lr        0.995 0        0.156  1     1060.  
+ 2 dRFE               0.1 rf        0.997 0.329    0.768  0.998  940.  
+ 3 dRFE               0.1 sgd       0.997 0.0373   0.606  1.00   163.  
+ 4 dRFE               0.1 svc       0.995 0.0871   0.181  1.00   840.  
+ 5 dRFE               0.2 lr        0.983 0.785    0.252  0.984 1014.  
+ 6 dRFE               0.2 rf        0.999 0.0243   0.832  1.00   503.  
+ 7 dRFE               0.2 sgd       0.998 0.0760   0.754  1.00    93.5 
+ 8 dRFE               0.2 svc       0.996 0.176    0.239  1.00   525.  
+ 9 RFE                0.1 lr        0.904 0.954    0.0881 0.904   79.3 
+10 RFE                0.1 rf        0.905 0.950    0.0943 0.904   41.8 
+11 RFE                0.1 sgd       0.904 0.956    0.0814 0.904    4.53
+12 RFE                0.1 svc       0.904 0.954    0.0876 0.904   85.3 
+13 RFE              100   lr        0.997 0.305    0.695  0.998 1405.  
+14 RFE              100   rf        0.997 0.31     0.69   0.998  760.  
+15 RFE              100   sgd       0.994 0.59     0.422  0.997   51.6 
+16 RFE              100   svc       0.996 0.415    0.585  0.998 1538.  
+[1] "2022-08-25 20:49:19 EDT"
+   user  system elapsed 
+ 31.133   0.817  39.170 
+─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
+ setting  value                       
+ version  R version 3.6.1 (2019-07-05)
+ os       CentOS Linux 7 (Core)       
+ system   x86_64, linux-gnu           
+ ui       X11                         
+ language (EN)                        
+ collate  en_US.UTF-8                 
+ ctype    en_US.UTF-8                 
+ tz       US/Eastern                  
+ date     2022-08-25                  
+
+─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ package     * version date       lib source        
+ abind         1.4-5   2016-07-21 [1] CRAN (R 3.6.1)
+ assertthat    0.2.1   2019-03-21 [2] CRAN (R 3.6.1)
+ backports     1.2.1   2020-12-09 [2] CRAN (R 3.6.1)
+ broom         0.8.0   2022-04-13 [1] CRAN (R 3.6.1)
+ car           3.0-13  2022-05-02 [1] CRAN (R 3.6.1)
+ carData       3.0-5   2022-01-06 [1] CRAN (R 3.6.1)
+ cli           3.3.0   2022-04-25 [1] CRAN (R 3.6.1)
+ colorspace    2.0-0   2020-11-11 [2] CRAN (R 3.6.1)
+ crayon        1.5.1   2022-03-26 [1] CRAN (R 3.6.1)
+ data.table    1.14.2  2021-09-27 [1] CRAN (R 3.6.1)
+ DBI           1.1.2   2021-12-20 [1] CRAN (R 3.6.1)
+ digest        0.6.29  2021-12-01 [1] CRAN (R 3.6.1)
+ dplyr       * 1.0.9   2022-04-28 [1] CRAN (R 3.6.1)
+ ellipsis      0.3.2   2021-04-29 [1] CRAN (R 3.6.1)
+ fansi         0.4.1   2020-01-08 [2] CRAN (R 3.6.1)
+ farver        2.0.3   2020-01-16 [2] CRAN (R 3.6.1)
+ generics      0.1.2   2022-01-31 [1] CRAN (R 3.6.1)
+ ggplot2     * 3.3.6   2022-05-03 [1] CRAN (R 3.6.1)
+ ggpubr      * 0.4.0   2020-06-27 [1] CRAN (R 3.6.1)
+ ggsci         2.9     2018-05-14 [1] CRAN (R 3.6.1)
+ ggsignif      0.6.3   2021-09-09 [1] CRAN (R 3.6.1)
+ glue          1.6.2   2022-02-24 [1] CRAN (R 3.6.1)
+ gtable        0.3.0   2019-03-25 [2] CRAN (R 3.6.1)
+ labeling      0.4.2   2020-10-20 [2] CRAN (R 3.6.1)
+ lifecycle     1.0.1   2021-09-24 [1] CRAN (R 3.6.1)
+ magrittr      2.0.3   2022-03-30 [1] CRAN (R 3.6.1)
+ munsell       0.5.0   2018-06-12 [2] CRAN (R 3.6.1)
+ pillar        1.7.0   2022-02-01 [1] CRAN (R 3.6.1)
+ pkgconfig     2.0.3   2019-09-22 [2] CRAN (R 3.6.1)
+ purrr         0.3.4   2020-04-17 [1] CRAN (R 3.6.1)
+ R.methodsS3   1.8.1   2020-08-26 [1] CRAN (R 3.6.1)
+ R.oo          1.25.0  2022-06-12 [1] CRAN (R 3.6.1)
+ R.utils       2.11.0  2021-09-26 [1] CRAN (R 3.6.1)
+ R6            2.5.0   2020-10-28 [2] CRAN (R 3.6.1)
+ rlang         1.0.2   2022-03-04 [1] CRAN (R 3.6.1)
+ rstatix       0.7.0   2021-02-13 [1] CRAN (R 3.6.1)
+ scales        1.1.1   2020-05-11 [2] CRAN (R 3.6.1)
+ sessioninfo   1.1.1   2018-11-05 [2] CRAN (R 3.6.1)
+ svglite       2.1.0   2022-02-03 [1] CRAN (R 3.6.1)
+ systemfonts   1.0.4   2022-02-11 [1] CRAN (R 3.6.1)
+ tibble        3.1.7   2022-05-03 [1] CRAN (R 3.6.1)
+ tidyr         1.2.0   2022-02-01 [1] CRAN (R 3.6.1)
+ tidyselect    1.1.2   2022-02-21 [1] CRAN (R 3.6.1)
+ utf8          1.1.4   2018-05-24 [2] CRAN (R 3.6.1)
+ vctrs         0.4.1   2022-04-13 [1] CRAN (R 3.6.1)
+ withr         2.3.0   2020-09-22 [2] CRAN (R 3.6.1)
+
+[1] /users/jbenjami/R/x86_64-pc-linux-gnu-library/3.6
+[2] /jhpce/shared/jhpce/core/R/3.6.1/lib64/R/library
+**** Job ends ****
+Thu Aug 25 20:49:22 EDT 2022
