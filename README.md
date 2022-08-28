@@ -19,6 +19,8 @@ If you the dRFEtools software or anything in this repository please cite the fol
 
 Benjamin, KJM, Katipalli, T, and Paquola, ACM. dRFEtools: Dynamic recursive feature elimination for omics.
 
+Pre-print DOI: https://doi.org/10.1101/2022.07.27.501227.
+
 ## Files
 
 | directory           | contents                                        |
@@ -30,3 +32,5 @@ Benjamin, KJM, Katipalli, T, and Paquola, ACM. dRFEtools: Dynamic recursive feat
 
 ## Public Files
 Supplementary Figures and Tables.
+
+[Supplementary Data](https://doi.org/10.5281/zenodo.7027085): hosted on zenodo
