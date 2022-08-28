@@ -34,3 +34,6 @@ Pre-print DOI: https://doi.org/10.1101/2022.07.27.501227.
 Supplementary Figures and Tables.
 
 [Supplementary Data](https://doi.org/10.5281/zenodo.7027085): hosted on zenodo
+
+Table S1: [dRFEtools_mdd_classification_GO_analysis.xlsx][tables1]
+[tables1]: ./brainseq_p1/binary_classification/supplementary_table/dRFEtools_mdd_classification_GO_analysis.xlsx
